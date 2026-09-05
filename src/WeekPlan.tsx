@@ -9,6 +9,7 @@ import {
   Coffee,
   CookingPot,
   Copy,
+  Dumbbell,
   Egg,
   Leaf,
   Moon,
@@ -28,6 +29,9 @@ import {
   prepTasks,
   storageNotes,
   usageNotes,
+  proteinTarget,
+  mealProtein,
+  dailyProtein,
 } from "../shared/weekly-plan.mjs";
 import { ingredients } from "../shared/ingredients.mjs";
 import sources from "../data/sources.json";
@@ -42,8 +46,12 @@ const foodName = (id: string) =>
   ingredients.find((item) => item.id === id)?.name || id;
 const amount = (item: Portion) =>
   `${foodName(item.id)} ${item.grams}g${item.basis === "cooked" ? "熟肉" : ""}`;
+const mealProteins = (meal: Meal) => [
+  meal.meat,
+  ...(meal.extraProtein ? [meal.extraProtein] : []),
+];
 const mealLines = (meal: Meal) => [
-  amount(meal.meat),
+  mealProteins(meal).map(amount).join(" + "),
   meal.vegetables.map(amount).join(" + "),
   `糙米饭 ${meal.rice}g熟重${meal.starch ? ` + ${amount(meal.starch)}` : ""}`,
 ];
@@ -77,6 +85,9 @@ function MealCard({
           <span className="week-meta">
             {guides[meal.guide as GuideKey].tool}
           </span>
+          <span className="week-protein-badge">
+            约{Math.round(mealProtein(meal))}g蛋白质
+          </span>
         </div>
         <img
           src={asset(source.localImage)}
@@ -89,7 +100,9 @@ function MealCard({
         <div>
           <dt>肉类</dt>
           <dd>
-            {amount(meal.meat)}
+            {mealProteins(meal).map((item) => (
+              <span key={item.id}>{amount(item)}</span>
+            ))}
             {meal.meat.id === "leg" && <small>去皮、去骨后称</small>}
           </dd>
         </div>
@@ -215,6 +228,9 @@ function Overview({ onOpen }: { onOpen?: (meal: Meal) => void }) {
                 <p className="week-snack-text">
                   加餐：{snackLines(day).join(" + ")}
                 </p>
+                <span className="week-overview-protein">
+                  全天约{Math.round(dailyProtein(day))}g蛋白质
+                </span>
               </td>
               {[day.lunch, day.dinner].map((meal, index) => (
                 <td key={index}>
@@ -308,9 +324,7 @@ export default function WeekPlan({
         <div>
           <p className="week-eyebrow">{week.label} · 2026</p>
           <h1>一周食谱</h1>
-          <p className="week-heading-note">
-            一人份 · 工作日午晚餐带饭
-          </p>
+          <p className="week-heading-note">一人份 · 工作日午晚餐带饭</p>
         </div>
         <div className="week-heading-actions">
           <button
@@ -343,6 +357,13 @@ export default function WeekPlan({
         <span>
           <CookingPot size={17} />
           <b>2.8kg</b>熟饭 / 周
+        </span>
+        <span>
+          <Dumbbell size={17} />
+          <b>
+            {proteinTarget.min}-{proteinTarget.max}g
+          </b>
+          蛋白质 / 天
         </span>
       </div>
       <nav className="week-views" aria-label="周食谱视图">
@@ -384,6 +405,26 @@ export default function WeekPlan({
                 </button>
               ))}
             </nav>
+            <section
+              className="week-protein-meter"
+              aria-label={`${day.label}蛋白质估算`}
+            >
+              <div>
+                <span>
+                  <Dumbbell size={18} />
+                  今日蛋白质
+                </span>
+                <strong>约{Math.round(dailyProtein(day))}g</strong>
+              </div>
+              <progress
+                max={proteinTarget.max}
+                value={Math.min(dailyProtein(day), proteinTarget.max)}
+              />
+              <p>
+                目标{proteinTarget.min}-{proteinTarget.max}
+                g；按常见食物成分估算，以包装营养表和实际可食重量为准。
+              </p>
+            </section>
             <section
               className="week-breakfast"
               aria-label={`${day.label}早餐和加餐`}
@@ -564,6 +605,22 @@ export default function WeekPlan({
             冷冻，前夜冷藏解冻；午晚餐分开复热，中心至少74℃。
           </p>
           <div className="week-sources">
+            <a
+              href="https://fdc.nal.usda.gov/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              蛋白质估算来源
+              <ArrowUpRight size={12} />
+            </a>
+            <a
+              href="https://pubmed.ncbi.nlm.nih.gov/36057893/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              力量训练蛋白证据
+              <ArrowUpRight size={12} />
+            </a>
             <a
               href="https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures"
               target="_blank"

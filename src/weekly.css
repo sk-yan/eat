@@ -178,6 +178,69 @@
   font-size: 13px;
   color: #718076;
 }
+.week-protein-badge {
+  display: block;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 3px 8px;
+  border: 1px solid #d5e2d9;
+  border-radius: 5px;
+  background: #f1f6f2;
+  color: #35644b;
+  font-size: 13px;
+  font-weight: 550;
+}
+.week-protein-meter {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.8fr) minmax(240px, 1.2fr);
+  align-items: center;
+  gap: 5px 24px;
+  padding: 15px 18px;
+  margin-bottom: 22px;
+  border-left: 4px solid #22664f;
+  background: #edf4ef;
+}
+.week-protein-meter > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  grid-row: span 2;
+}
+.week-protein-meter > div span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #52695b;
+  font-size: 14px;
+}
+.week-protein-meter strong {
+  color: #214d38;
+  font-size: 23px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.week-protein-meter progress {
+  width: 100%;
+  height: 9px;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: #d8e4db;
+}
+.week-protein-meter progress::-webkit-progress-bar {
+  background: #d8e4db;
+}
+.week-protein-meter progress::-webkit-progress-value {
+  background: #3d775a;
+}
+.week-protein-meter progress::-moz-progress-bar {
+  background: #3d775a;
+}
+.week-protein-meter p {
+  color: #687a6e;
+  font-size: 12px;
+  line-height: 1.6;
+}
 .week-meal-intro {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 124px;
@@ -358,6 +421,13 @@
 .week-overview .week-snack-text {
   color: #927253;
   margin-top: 10px;
+}
+.week-overview-protein {
+  display: block;
+  margin-top: 10px;
+  color: #2e6549;
+  font-size: 13px;
+  font-weight: 600;
 }
 .week-usage {
   min-width: 580px;
@@ -681,7 +751,7 @@
   }
   .week-summary {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     padding: 14px 0;
   }
@@ -690,13 +760,25 @@
     font-size: 13px;
     line-height: 1.8;
   }
-  .week-summary svg { display: none; }
+  .week-summary svg {
+    display: none;
+  }
   .week-summary b {
     display: block;
     font-size: 16px;
   }
-  .week-summary > span:last-child {
-    flex-basis: 100%;
+  .week-protein-meter {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 13px 14px;
+  }
+  .week-protein-meter > div {
+    grid-row: auto;
+    justify-content: space-between;
+  }
+  .week-protein-meter strong {
+    font-size: 20px;
   }
   .week-views {
     gap: 0;

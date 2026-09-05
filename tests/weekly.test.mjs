@@ -7,6 +7,9 @@ import {
   guides,
   breakfastLines,
   snackLines,
+  proteinTarget,
+  dailyProtein,
+  mealProtein,
 } from "../shared/weekly-plan.mjs";
 import { ingredients } from "../shared/ingredients.mjs";
 import sources from "../data/sources.json" with { type: "json" };
@@ -26,6 +29,7 @@ test("weekly menu contains seven days, fourteen meals and ten packed meals", () 
       assert.ok(sources[meal.imageKey]?.url);
       for (const portion of [
         meal.meat,
+        ...(meal.extraProtein ? [meal.extraProtein] : []),
         ...meal.vegetables,
         ...(meal.starch ? [meal.starch] : []),
       ]) {
@@ -38,11 +42,11 @@ test("weekly totals reconcile to the confirmed actual-purchase menu", () => {
   const totals = weeklyTotals();
   assert.equal(totals.rice, 2800);
   assert.equal(totals.vegetables, 4200);
-  assert.deepEqual(totals.cooked, { leg: 295, shank: 100 });
+  assert.deepEqual(totals.cooked, { leg: 350, shank: 120 });
   for (const [id, grams] of Object.entries({
-    breast: 650,
-    leg: 400,
-    shank: 150,
+    breast: 1085,
+    leg: 475,
+    shank: 180,
     rib: 150,
     steak: 150,
     shrimp: 250,
@@ -68,6 +72,19 @@ test("weekly totals reconcile to the confirmed actual-purchase menu", () => {
       .reduce((sum, day) => sum + day.lunch.rice + day.dinner.rice, 0),
     2000,
   );
+});
+test("each day reaches the protein target while beef and shrimp stay bounded", () => {
+  assert.deepEqual(proteinTarget, { min: 120, max: 130 });
+  for (const day of days) {
+    const protein = dailyProtein(day);
+    assert.ok(protein >= proteinTarget.min, `${day.label}: ${protein}`);
+    assert.ok(protein <= proteinTarget.max, `${day.label}: ${protein}`);
+    assert.ok(mealProtein(day.lunch) >= 30, `${day.label}午餐`);
+    assert.ok(mealProtein(day.dinner) >= 30, `${day.label}晚餐`);
+  }
+  const totals = weeklyTotals();
+  assert.equal(totals.foods.rib + totals.foods.steak + totals.foods.shank, 480);
+  assert.equal(totals.foods.shrimp, 250);
 });
 test("milk and yogurt breakfasts alternate without duplicating daily food", () => {
   assert.equal(days.filter((day) => day.breakfast === "yogurt").length, 3);
