@@ -3,7 +3,6 @@ export const macroFactors = {
   milk: { protein: 0.03, fat: 0.032, carbs: 0.046 },
   yogurt: { protein: 0.05, fat: 0.033, carbs: 0.035 },
   blueberry: { protein: 0.007, fat: 0.003, carbs: 0.13 },
-  whey: { protein: 0.8, fat: 0.06, carbs: 0.08 },
   breast: { protein: 0.225, fat: 0.026, carbs: 0 },
   leg: { protein: 0.26, fat: 0.06, carbs: 0 },
   shank: { protein: 0.29, fat: 0.05, carbs: 0 },
@@ -112,22 +111,17 @@ export function snackMacros(day) {
   return addMacros(...parts);
 }
 
-export function boostMacros(boost) {
-  return addMacros(...boost.map((item) => foodMacros(item.id, item.grams)));
-}
-
-export function dayMacros(day, boost) {
+export function dayMacros(day) {
   return addMacros(
     breakfastMacros(day),
     snackMacros(day),
-    boostMacros(boost),
     mealMacros(day.lunch),
     mealMacros(day.dinner),
   );
 }
 
-export function averageMacros(days, boost) {
-  const total = addMacros(...days.map((day) => dayMacros(day, boost)));
+export function averageMacros(days) {
+  const total = addMacros(...days.map((day) => dayMacros(day)));
   return {
     protein: total.protein / days.length,
     fat: total.fat / days.length,

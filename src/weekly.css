@@ -135,8 +135,8 @@
 }
 .week-breakfast {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
   margin-bottom: 26px;
   padding: 0 0 24px;
   border-bottom: 1px solid #e0e6e2;
@@ -156,15 +156,6 @@
 .week-breakfast > div + div {
   padding-left: 20px;
   border-left: 1px solid #dfe6e1;
-}
-.week-breakfast .protein-boost h2 {
-  color: #35624a;
-}
-.week-breakfast .protein-boost > small {
-  display: block;
-  margin-top: 7px;
-  color: #a06c4f;
-  font-size: 12px;
 }
 .week-meals {
   display: grid;

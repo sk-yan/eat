@@ -9,7 +9,6 @@ import {
   Coffee,
   CookingPot,
   Copy,
-  Dumbbell,
   Egg,
   Flame,
   Moon,
@@ -29,14 +28,11 @@ import {
   prepTasks,
   storageNotes,
   usageNotes,
-  proteinBoost,
-  boostLines,
 } from "../shared/weekly-plan.mjs";
 import { ingredients } from "../shared/ingredients.mjs";
 import {
   averageMacros,
   breakfastMacros,
-  boostMacros,
   dayMacros,
   mealMacros,
   roundMacros,
@@ -51,10 +47,9 @@ type Portion = Meal["meat"];
 type View = "daily" | "overview" | "prep" | "usage";
 type GuideKey = keyof typeof guides;
 const totals = weeklyTotals();
-const planAverage = roundMacros(averageMacros(days, proteinBoost));
+const planAverage = roundMacros(averageMacros(days));
 const specialNames: Record<string, string> = {
   salmon: "三文鱼",
-  whey: "乳清蛋白粉",
   oil: "牛油果油",
 };
 const foodName = (id: string) =>
@@ -274,7 +269,7 @@ function Overview({ onOpen }: { onOpen?: (meal: Meal) => void }) {
                   加餐：{snackLines(day).join(" + ")}
                 </p>
                 <MacroStrip
-                  value={roundMacros(dayMacros(day, proteinBoost))}
+                  value={roundMacros(dayMacros(day))}
                   compact
                 />
               </td>
@@ -330,10 +325,9 @@ export default function WeekPlan({
     }
   });
   const day = days.find((item) => item.id === dayId) || days[0];
-  const currentDayMacros = roundMacros(dayMacros(day, proteinBoost));
+  const currentDayMacros = roundMacros(dayMacros(day));
   const currentBreakfastMacros = roundMacros(breakfastMacros(day));
   const currentSnackMacros = roundMacros(snackMacros(day));
-  const currentBoostMacros = roundMacros(boostMacros(proteinBoost));
   useEffect(() => {
     if (!toast) return;
     const timeout = setTimeout(() => setToast(""), 3500);
@@ -414,7 +408,7 @@ export default function WeekPlan({
       </div>
       <p className="week-protein-balance">
         <strong>主菜分配：</strong>
-        牛肉3顿、三文鱼2顿、虾仁2顿、去皮鸡腿3顿、鸡胸4顿。高蛋白看全天总量，不等于每顿都只吃红肉。
+        牛肉3顿、三文鱼2顿、虾仁2顿、去皮鸡腿3顿、鸡胸4顿。蛋白质全部并入早餐和午晚餐，不另喝蛋白粉。
       </p>
       <NutritionCalculator plan={planAverage} />
       <nav className="week-views" aria-label="周食谱视图">
@@ -468,7 +462,7 @@ export default function WeekPlan({
                 <strong>约{currentDayMacros.calories} kcal</strong>
               </div>
               <MacroStrip value={currentDayMacros} />
-              <p>含早餐、加餐、补蛋白、午餐和晚餐；P/F/C为估算值。</p>
+              <p>含早餐、加餐、午餐和晚餐；P/F/C为估算值。</p>
             </section>
             <section
               className="week-breakfast"
@@ -489,15 +483,6 @@ export default function WeekPlan({
                 </h2>
                 <p>{snackLines(day).join(" + ")}</p>
                 <MacroStrip value={currentSnackMacros} compact />
-              </div>
-              <div className="protein-boost">
-                <h2>
-                  <Dumbbell size={19} />
-                  补蛋白
-                </h2>
-                <p>{boostLines().join(" + ")}</p>
-                <MacroStrip value={currentBoostMacros} compact />
-                <small>乳清175g/周为新增项</small>
               </div>
             </section>
             <div className="week-meals">
@@ -622,20 +607,15 @@ export default function WeekPlan({
                     ))}
                   <tr>
                     <th scope="row">三色糙米</th>
-                    <td>熟饭1450g</td>
+                    <td>熟饭1205g</td>
                     <td>
-                      午餐100-150g、晚餐75g；训练量大的当天优先安排150g午餐饭。
+                      午餐80-130g、晚餐60g；训练量大的当天优先安排130g午餐饭。
                     </td>
                   </tr>
                   <tr className="new-item-row">
                     <th scope="row">三文鱼</th>
                     <td>{totals.foods.salmon}g</td>
                     <td>{usageNotes.salmon}</td>
-                  </tr>
-                  <tr className="new-item-row">
-                    <th scope="row">乳清蛋白粉</th>
-                    <td>{totals.foods.whey}g</td>
-                    <td>{usageNotes.whey}</td>
                   </tr>
                   <tr>
                     <th scope="row">牛油果油</th>
@@ -647,7 +627,7 @@ export default function WeekPlan({
             </div>
             <p className="week-weight-note">
               蔬菜共{totals.vegetables / 1000}
-              kg；红薯300g、土豆400g、熟糙米饭1450g。调味料和试吃不在营养估算内。
+              kg；红薯300g、土豆400g、熟糙米饭1205g。调味料和试吃不在营养估算内。
             </p>
           </section>
         )}

@@ -7,7 +7,6 @@ import {
   guides,
   breakfastLines,
   snackLines,
-  proteinBoost,
 } from "../shared/weekly-plan.mjs";
 import { ingredients } from "../shared/ingredients.mjs";
 import {
@@ -47,19 +46,18 @@ test("weekly menu contains seven days, fourteen meals and ten packed meals", () 
 });
 test("weekly totals reconcile to the confirmed actual-purchase menu", () => {
   const totals = weeklyTotals();
-  assert.equal(totals.rice, 1450);
+  assert.equal(totals.rice, 1205);
   assert.equal(totals.vegetables, 4200);
-  assert.deepEqual(totals.cooked, { leg: 450, shank: 150 });
+  assert.deepEqual(totals.cooked, { leg: 730, shank: 150 });
   for (const [id, grams] of Object.entries({
-    breast: 1265,
-    leg: 615,
+    breast: 1280,
+    leg: 997,
     shank: 225,
-    rib: 180,
-    steak: 180,
-    shrimp: 360,
-    salmon: 400,
-    whey: 175,
-    oil: 105,
+    rib: 230,
+    steak: 240,
+    shrimp: 540,
+    salmon: 420,
+    oil: 94,
     sweet: 300,
     potato: 400,
     carrot: 600,
@@ -80,29 +78,32 @@ test("weekly totals reconcile to the confirmed actual-purchase menu", () => {
     days
       .filter((day) => day.packed)
       .reduce((sum, day) => sum + day.lunch.rice + day.dinner.rice, 0),
-    1050,
+    875,
   );
 });
 test("low-carb weekly plan keeps each day inside its macro guardrails", () => {
-  const average = roundMacros(averageMacros(days, proteinBoost));
+  const average = roundMacros(averageMacros(days));
   assert.deepEqual(average, {
-    calories: 1795,
-    protein: 165,
-    fat: 67,
-    carbs: 132,
+    calories: 1762,
+    protein: 164,
+    fat: 68,
+    carbs: 122,
   });
   for (const day of days) {
-    const macros = roundMacros(dayMacros(day, proteinBoost));
-    assert.ok(macros.calories >= 1700 && macros.calories <= 2000, day.label);
+    const macros = roundMacros(dayMacros(day));
+    assert.ok(macros.calories >= 1700 && macros.calories <= 1850, day.label);
     assert.ok(macros.protein >= 155 && macros.protein <= 180, day.label);
-    assert.ok(macros.carbs >= 115 && macros.carbs <= 150, day.label);
-    assert.ok(mealMacros(day.lunch).protein >= 30, `${day.label}午餐`);
-    assert.ok(mealMacros(day.dinner).protein >= 30, `${day.label}晚餐`);
+    assert.ok(macros.carbs >= 105 && macros.carbs <= 140, day.label);
+    assert.ok(mealMacros(day.lunch).protein >= 50, `${day.label}午餐`);
+    assert.ok(mealMacros(day.dinner).protein >= 50, `${day.label}晚餐`);
   }
   const totals = weeklyTotals();
-  assert.equal(totals.foods.rib + totals.foods.steak + totals.foods.shank, 585);
-  assert.equal(totals.foods.shrimp, 360);
-  assert.equal(totals.foods.salmon, 400);
+  assert.equal(totals.foods.rib + totals.foods.steak + totals.foods.shank, 695);
+  assert.equal(totals.foods.shrimp, 540);
+  assert.equal(totals.foods.salmon, 420);
+  assert.equal(totals.foods.whey, undefined);
+  assert.equal(days[2].lunch.extraProtein.id, "leg");
+  assert.equal(days[2].lunch.extraProtein.grams, 100);
 });
 test("main dishes keep the agreed beef, fish, shrimp and poultry mix", () => {
   const mainIds = days.flatMap((day) => [day.lunch.meat.id, day.dinner.meat.id]);
