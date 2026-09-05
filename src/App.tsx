@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Bookmark,
+  CalendarDays,
   Check,
   ChefHat,
   ChevronDown,
@@ -35,6 +36,7 @@ import {
 import { filterRecipes, matchRecipe } from "../shared/matching.mjs";
 import type { Category, Ingredient, Recipe, SearchResponse } from "./types";
 import { FamilyRecipeEditor, FamilyRecipeDetail } from "./FamilyRecipes";
+import WeekPlan from "./WeekPlan";
 
 const STORE = "afterwork-kitchen-v1";
 const groupNames: Record<Category, string> = {
@@ -196,7 +198,12 @@ export default function App() {
   const [pantry, setPantry] = useState<Ingredient[]>(saved.pantry);
   const [selected, setSelected] = useState<string[]>(saved.selected);
   const [favorites, setFavorites] = useState<Recipe[]>(saved.favorites);
-  const [page, setPage] = useState<"find" | "favorites" | "family">("find");
+  const [page, setPage] = useState<"find" | "favorites" | "family" | "week">(
+    () =>
+      new URLSearchParams(window.location.search).get("week") === "1"
+        ? "week"
+        : "find",
+  );
   const [view, setView] = useState<"curated" | "online">("curated");
   const [catalog, setCatalog] = useState<Recipe[]>([]);
   const [catalogError, setCatalogError] = useState("");
@@ -447,6 +454,13 @@ export default function App() {
         </a>
         <nav className="main-nav" aria-label="主要导航">
           <button
+            className={page === "week" ? "nav-active" : ""}
+            onClick={() => setPage("week")}
+          >
+            <CalendarDays size={16} />
+            一周食谱
+          </button>
+          <button
             className={page === "find" ? "nav-active" : ""}
             onClick={() => setPage("find")}
           >
@@ -497,420 +511,426 @@ export default function App() {
         </button>
       </header>
 
-      <div className="workspace">
-        <aside className="sidebar">
-          {picker}
-          <div className="equipment-section">
-            <div className="section-label">
-              <CookingPot size={15} />
-              我的厨具
-            </div>
-            <div className="equipment-tags">
-              {equipment.map((item) => (
-                <span key={item.id}>{item.name}</span>
-              ))}
-            </div>
-          </div>
-          <div className="sidebar-footer">
-            <span className="status-dot" />
-            我的厨房 · 本地保存
-          </div>
-        </aside>
-        <main className="main-content">
-          <div className="page-heading">
-            <div>
-              <p className="eyebrow">
-                {page === "family"
-                  ? "FAMILY COOKBOOK"
-                  : page === "favorites"
-                    ? "MY COLLECTION"
-                    : "YOUR EVERYDAY TABLE"}
-              </p>
-              <h1>
-                {page === "family"
-                  ? "家里的拿手菜"
-                  : page === "favorites"
-                    ? "想再做一次的菜"
-                    : "今晚做什么"}
-              </h1>
-            </div>
-            <span className="page-heading-icon">
-              <Leaf size={27} strokeWidth={1.35} />
-            </span>
-          </div>
-          {page === "find" && (
-            <>
-              <section className="selection-bar" aria-label="已选食材">
-                <div className="selection-top">
-                  <span className="small-label">今天用这些</span>
-                  <button
-                    className="mobile-choose text-button"
-                    onClick={() => setMobilePicker(true)}
-                  >
-                    <SlidersHorizontal size={15} />
-                    选食材
-                  </button>
-                </div>
-                <div className="selection-content">
-                  <div className="selected-items">
-                    {chosen.length ? (
-                      chosen.map((item) => (
-                        <span
-                          className={`selected-item ${item.category}`}
-                          key={item.id}
-                        >
-                          {item.name}
-                          <button
-                            aria-label={`移除${item.name}`}
-                            onClick={() => selectIngredient(item.id)}
-                          >
-                            <X size={13} />
-                          </button>
-                        </span>
-                      ))
-                    ) : (
-                      <span className="selection-empty">尚未选择食材</span>
-                    )}
-                  </div>
-                  <button
-                    className="find-button"
-                    onClick={onlineSearch}
-                    disabled={!chosen.length || loading}
-                  >
-                    {loading ? (
-                      <LoaderCircle size={18} className="spin" />
-                    ) : (
-                      <Search size={18} />
-                    )}
-                    <span>{loading ? "正在查找" : "找菜谱"}</span>
-                    <ArrowRight size={17} />
-                  </button>
-                </div>
-              </section>
-              <div className="quick-combos">
-                <span>换个搭配</span>
-                <button
-                  onClick={() =>
-                    selectCombo(["shrimp", "asparagus", "mushroom"])
-                  }
-                >
-                  虾仁 + 芦笋
-                  <ArrowUpRight size={13} />
-                </button>
-                <button
-                  onClick={() =>
-                    selectCombo(["rib", "potato", "onion", "carrot"])
-                  }
-                >
-                  牛肋条 + 土豆
-                  <ArrowUpRight size={13} />
-                </button>
-                <button
-                  onClick={() => selectCombo(["leg", "mushroom", "onion"])}
-                >
-                  鸡腿 + 口蘑
-                  <ArrowUpRight size={13} />
-                </button>
+      {page === "week" ? (
+        <WeekPlan />
+      ) : (
+        <div className="workspace">
+          <aside className="sidebar">
+            {picker}
+            <div className="equipment-section">
+              <div className="section-label">
+                <CookingPot size={15} />
+                我的厨具
               </div>
-              <div className="result-nav">
-                <div
-                  className="result-tabs"
-                  role="tablist"
-                  aria-label="菜谱类型"
-                >
-                  <button
-                    role="tab"
-                    aria-selected={view === "curated"}
-                    className={view === "curated" ? "selected" : ""}
-                    onClick={() => setView("curated")}
-                  >
-                    备餐做法<span>{matched.length}</span>
-                  </button>
-                  <button
-                    role="tab"
-                    aria-selected={view === "online"}
-                    className={view === "online" ? "selected" : ""}
-                    onClick={() => setView("online")}
-                  >
-                    网上菜谱{result && <span>{result.recipes.length}</span>}
-                  </button>
-                </div>
-                <span className="result-meta">
-                  {view === "curated"
-                    ? `${fullMatchCount}道无须增加主料`
-                    : result
-                      ? `下厨房 · ${new Date(result.fetchedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}${result.cached ? " 缓存结果" : " 检索"}`
-                      : "来源：下厨房"}
-                </span>
-              </div>
-              {view === "curated" && (
-                <div className="filters">
-                  <label className="filter-select">
-                    <CookingPot size={15} />
-                    <select
-                      aria-label="筛选厨具"
-                      value={tool}
-                      onChange={(event) => setTool(event.target.value)}
-                    >
-                      <option value="">全部厨具</option>
-                      {equipment.map((e) => (
-                        <option value={e.id} key={e.id}>
-                          {e.name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown size={13} />
-                  </label>
-                  <label className="filter-select">
-                    <Clock3 size={15} />
-                    <select
-                      aria-label="筛选用时"
-                      value={time}
-                      onChange={(event) => setTime(Number(event.target.value))}
-                    >
-                      <option value={0}>不限用时</option>
-                      <option value={15}>15分钟内</option>
-                      <option value={30}>30分钟内</option>
-                      <option value={60}>60分钟内</option>
-                    </select>
-                    <ChevronDown size={13} />
-                  </label>
-                  <label className="filter-check">
-                    <input
-                      type="checkbox"
-                      checked={prep}
-                      onChange={(event) => setPrep(event.target.checked)}
-                    />
-                    适合带饭
-                  </label>
-                  <label className="toggle-label">
-                    <input
-                      type="checkbox"
-                      role="switch"
-                      checked={strict}
-                      onChange={(event) => setStrict(event.target.checked)}
-                    />
-                    <span className="toggle-track" />
-                    仅用已选食材
-                  </label>
-                </div>
-              )}
-            </>
-          )}
-          {page === "favorites" && (
-            <div className="favorites-heading">
-              <span>{favorites.length}道菜谱</span>
-              <button className="text-button" onClick={() => setPage("find")}>
-                <ArrowLeft size={15} />
-                继续找菜谱
-              </button>
-            </div>
-          )}
-          {page === "family" && (
-            <div className="family-heading">
-              <span>{familyRecipes.length}道家常菜</span>
-              <button
-                className="text-button"
-                onClick={() => void refreshFamily()}
-              >
-                <RotateCcw size={15} />
-                刷新
-              </button>
-            </div>
-          )}
-
-          {(page === "find" &&
-            ((view === "online" && loading) ||
-              (view === "curated" && catalogLoading))) ||
-          (page === "family" && familyLoading) ? (
-            <div
-              className="recipe-grid skeleton-grid"
-              aria-label="正在搜索菜谱"
-            >
-              {[1, 2, 3, 4, 5, 6].map((x) => (
-                <div className="skeleton-card" key={x}>
-                  <div />
-                  <span />
-                  <span />
-                </div>
-              ))}
-            </div>
-          ) : page === "find" &&
-            view === "online" &&
-            (searchError || !result) ? (
-            <EmptyState
-              icon={<Search size={32} />}
-              title={searchError ? "这次没能连上原站" : "网上菜谱"}
-              text={
-                searchError ||
-                (chosen.length
-                  ? chosen.map((x) => x.name).join(" · ")
-                  : "尚未选择食材")
-              }
-            >
-              <button
-                className="primary-button"
-                disabled={!chosen.length}
-                onClick={onlineSearch}
-              >
-                <Search size={16} />
-                {searchError ? "重新查找" : "搜索这些食材"}
-              </button>
-              {chosen.length > 0 && (
-                <a
-                  className="secondary-button"
-                  href={directSearch}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  到下厨房搜索
-                  <ArrowUpRight size={16} />
-                </a>
-              )}
-            </EmptyState>
-          ) : catalogError && view === "curated" && page === "find" ? (
-            <EmptyState
-              icon={<CookingPot size={32} />}
-              title={catalogError}
-              text=""
-            >
-              <button
-                className="primary-button"
-                onClick={() => setBoot((x) => x + 1)}
-              >
-                重新加载
-              </button>
-            </EmptyState>
-          ) : page === "family" && familyError ? (
-            <EmptyState
-              icon={<Users size={32} />}
-              title="全家菜谱暂时无法读取"
-              text={familyError}
-            >
-              <button
-                className="primary-button"
-                onClick={() => void refreshFamily()}
-              >
-                重试
-              </button>
-            </EmptyState>
-          ) : displayed.length ? (
-            <>
-              <div className="recipe-grid">
-                {displayed.map((recipe, index) => (
-                  <RecipeCard
-                    key={recipe.id}
-                    recipe={recipe}
-                    selected={selected}
-                    pantry={pantry}
-                    favorite={favorites.some((r) => r.id === recipe.id)}
-                    onFavorite={() => toggleFavorite(recipe)}
-                    onOpen={() => setDetail(recipe)}
-                    index={index}
-                  />
+              <div className="equipment-tags">
+                {equipment.map((item) => (
+                  <span key={item.id}>{item.name}</span>
                 ))}
               </div>
-              <div className="results-end">
-                <span />
-                {page === "family"
-                  ? `${displayed.length}道家常菜 · 全家共享`
-                  : page === "favorites"
-                    ? "留给下一次下厨"
-                    : view === "curated"
-                      ? `${displayed.length}道备餐做法 · 主料按一人份整理`
-                      : `${displayed.length}条原站结果 · 用料以原菜谱为准`}
-                <span />
+            </div>
+            <div className="sidebar-footer">
+              <span className="status-dot" />
+              我的厨房 · 本地保存
+            </div>
+          </aside>
+          <main className="main-content">
+            <div className="page-heading">
+              <div>
+                <p className="eyebrow">
+                  {page === "family"
+                    ? "FAMILY COOKBOOK"
+                    : page === "favorites"
+                      ? "MY COLLECTION"
+                      : "YOUR EVERYDAY TABLE"}
+                </p>
+                <h1>
+                  {page === "family"
+                    ? "家里的拿手菜"
+                    : page === "favorites"
+                      ? "想再做一次的菜"
+                      : "今晚做什么"}
+                </h1>
               </div>
-              {page === "find" && view === "curated" && (
-                <button className="more-online" onClick={onlineSearch}>
-                  <Search size={16} />
-                  再到网上找一找
-                  <ArrowRight size={16} />
-                </button>
-              )}
-            </>
-          ) : (
-            <EmptyState
-              icon={
-                page === "favorites" ? (
-                  <Bookmark size={32} />
-                ) : (
-                  <CookingPot size={32} />
-                )
-              }
-              title={
-                page === "family"
-                  ? "家里的第一道拿手菜"
-                  : page === "favorites"
-                    ? "收藏夹还空着"
-                    : view === "online"
-                      ? "原站没有返回对应菜谱"
-                      : !selected.length
-                        ? "今天想用哪些食材"
-                        : "暂时没有符合条件的做法"
-              }
-              text={
-                page === "family"
-                  ? "把熟悉的味道，记在一起。"
-                  : page === "favorites"
-                    ? "喜欢的菜，留在这里。"
-                    : selected.length
-                      ? chosen.map((x) => x.name).join(" · ")
-                      : "你的食材已经在厨房里。"
-              }
-            >
-              {page === "family" ? (
-                <button
-                  className="primary-button"
-                  onClick={() => setFamilyEditor("new")}
-                >
-                  <Plus size={17} />
-                  添加家常菜
-                </button>
-              ) : page === "favorites" ? (
-                <button
-                  className="primary-button"
-                  onClick={() => setPage("find")}
-                >
-                  去找菜谱
-                  <ArrowRight size={16} />
-                </button>
-              ) : !selected.length ? (
-                <button
-                  className="primary-button"
-                  onClick={() => selectCombo(defaultSelected)}
-                >
-                  鸡胸肉 + 西兰花 + 口蘑
-                </button>
-              ) : (
-                <>
+              <span className="page-heading-icon">
+                <Leaf size={27} strokeWidth={1.35} />
+              </span>
+            </div>
+            {page === "find" && (
+              <>
+                <section className="selection-bar" aria-label="已选食材">
+                  <div className="selection-top">
+                    <span className="small-label">今天用这些</span>
+                    <button
+                      className="mobile-choose text-button"
+                      onClick={() => setMobilePicker(true)}
+                    >
+                      <SlidersHorizontal size={15} />
+                      选食材
+                    </button>
+                  </div>
+                  <div className="selection-content">
+                    <div className="selected-items">
+                      {chosen.length ? (
+                        chosen.map((item) => (
+                          <span
+                            className={`selected-item ${item.category}`}
+                            key={item.id}
+                          >
+                            {item.name}
+                            <button
+                              aria-label={`移除${item.name}`}
+                              onClick={() => selectIngredient(item.id)}
+                            >
+                              <X size={13} />
+                            </button>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="selection-empty">尚未选择食材</span>
+                      )}
+                    </div>
+                    <button
+                      className="find-button"
+                      onClick={onlineSearch}
+                      disabled={!chosen.length || loading}
+                    >
+                      {loading ? (
+                        <LoaderCircle size={18} className="spin" />
+                      ) : (
+                        <Search size={18} />
+                      )}
+                      <span>{loading ? "正在查找" : "找菜谱"}</span>
+                      <ArrowRight size={17} />
+                    </button>
+                  </div>
+                </section>
+                <div className="quick-combos">
+                  <span>换个搭配</span>
                   <button
-                    className="secondary-button"
-                    onClick={() => {
-                      setStrict(false);
-                      setTool("");
-                      setTime(0);
-                      setPrep(false);
-                      setView("curated");
-                    }}
+                    onClick={() =>
+                      selectCombo(["shrimp", "asparagus", "mushroom"])
+                    }
                   >
-                    清除筛选
+                    虾仁 + 芦笋
+                    <ArrowUpRight size={13} />
                   </button>
+                  <button
+                    onClick={() =>
+                      selectCombo(["rib", "potato", "onion", "carrot"])
+                    }
+                  >
+                    牛肋条 + 土豆
+                    <ArrowUpRight size={13} />
+                  </button>
+                  <button
+                    onClick={() => selectCombo(["leg", "mushroom", "onion"])}
+                  >
+                    鸡腿 + 口蘑
+                    <ArrowUpRight size={13} />
+                  </button>
+                </div>
+                <div className="result-nav">
+                  <div
+                    className="result-tabs"
+                    role="tablist"
+                    aria-label="菜谱类型"
+                  >
+                    <button
+                      role="tab"
+                      aria-selected={view === "curated"}
+                      className={view === "curated" ? "selected" : ""}
+                      onClick={() => setView("curated")}
+                    >
+                      备餐做法<span>{matched.length}</span>
+                    </button>
+                    <button
+                      role="tab"
+                      aria-selected={view === "online"}
+                      className={view === "online" ? "selected" : ""}
+                      onClick={() => setView("online")}
+                    >
+                      网上菜谱{result && <span>{result.recipes.length}</span>}
+                    </button>
+                  </div>
+                  <span className="result-meta">
+                    {view === "curated"
+                      ? `${fullMatchCount}道无须增加主料`
+                      : result
+                        ? `下厨房 · ${new Date(result.fetchedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}${result.cached ? " 缓存结果" : " 检索"}`
+                        : "来源：下厨房"}
+                  </span>
+                </div>
+                {view === "curated" && (
+                  <div className="filters">
+                    <label className="filter-select">
+                      <CookingPot size={15} />
+                      <select
+                        aria-label="筛选厨具"
+                        value={tool}
+                        onChange={(event) => setTool(event.target.value)}
+                      >
+                        <option value="">全部厨具</option>
+                        {equipment.map((e) => (
+                          <option value={e.id} key={e.id}>
+                            {e.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown size={13} />
+                    </label>
+                    <label className="filter-select">
+                      <Clock3 size={15} />
+                      <select
+                        aria-label="筛选用时"
+                        value={time}
+                        onChange={(event) =>
+                          setTime(Number(event.target.value))
+                        }
+                      >
+                        <option value={0}>不限用时</option>
+                        <option value={15}>15分钟内</option>
+                        <option value={30}>30分钟内</option>
+                        <option value={60}>60分钟内</option>
+                      </select>
+                      <ChevronDown size={13} />
+                    </label>
+                    <label className="filter-check">
+                      <input
+                        type="checkbox"
+                        checked={prep}
+                        onChange={(event) => setPrep(event.target.checked)}
+                      />
+                      适合带饭
+                    </label>
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        role="switch"
+                        checked={strict}
+                        onChange={(event) => setStrict(event.target.checked)}
+                      />
+                      <span className="toggle-track" />
+                      仅用已选食材
+                    </label>
+                  </div>
+                )}
+              </>
+            )}
+            {page === "favorites" && (
+              <div className="favorites-heading">
+                <span>{favorites.length}道菜谱</span>
+                <button className="text-button" onClick={() => setPage("find")}>
+                  <ArrowLeft size={15} />
+                  继续找菜谱
+                </button>
+              </div>
+            )}
+            {page === "family" && (
+              <div className="family-heading">
+                <span>{familyRecipes.length}道家常菜</span>
+                <button
+                  className="text-button"
+                  onClick={() => void refreshFamily()}
+                >
+                  <RotateCcw size={15} />
+                  刷新
+                </button>
+              </div>
+            )}
+
+            {(page === "find" &&
+              ((view === "online" && loading) ||
+                (view === "curated" && catalogLoading))) ||
+            (page === "family" && familyLoading) ? (
+              <div
+                className="recipe-grid skeleton-grid"
+                aria-label="正在搜索菜谱"
+              >
+                {[1, 2, 3, 4, 5, 6].map((x) => (
+                  <div className="skeleton-card" key={x}>
+                    <div />
+                    <span />
+                    <span />
+                  </div>
+                ))}
+              </div>
+            ) : page === "find" &&
+              view === "online" &&
+              (searchError || !result) ? (
+              <EmptyState
+                icon={<Search size={32} />}
+                title={searchError ? "这次没能连上原站" : "网上菜谱"}
+                text={
+                  searchError ||
+                  (chosen.length
+                    ? chosen.map((x) => x.name).join(" · ")
+                    : "尚未选择食材")
+                }
+              >
+                <button
+                  className="primary-button"
+                  disabled={!chosen.length}
+                  onClick={onlineSearch}
+                >
+                  <Search size={16} />
+                  {searchError ? "重新查找" : "搜索这些食材"}
+                </button>
+                {chosen.length > 0 && (
                   <a
-                    className="primary-button"
+                    className="secondary-button"
                     href={directSearch}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    去原站查找
+                    到下厨房搜索
                     <ArrowUpRight size={16} />
                   </a>
-                </>
-              )}
-            </EmptyState>
-          )}
-        </main>
-      </div>
+                )}
+              </EmptyState>
+            ) : catalogError && view === "curated" && page === "find" ? (
+              <EmptyState
+                icon={<CookingPot size={32} />}
+                title={catalogError}
+                text=""
+              >
+                <button
+                  className="primary-button"
+                  onClick={() => setBoot((x) => x + 1)}
+                >
+                  重新加载
+                </button>
+              </EmptyState>
+            ) : page === "family" && familyError ? (
+              <EmptyState
+                icon={<Users size={32} />}
+                title="全家菜谱暂时无法读取"
+                text={familyError}
+              >
+                <button
+                  className="primary-button"
+                  onClick={() => void refreshFamily()}
+                >
+                  重试
+                </button>
+              </EmptyState>
+            ) : displayed.length ? (
+              <>
+                <div className="recipe-grid">
+                  {displayed.map((recipe, index) => (
+                    <RecipeCard
+                      key={recipe.id}
+                      recipe={recipe}
+                      selected={selected}
+                      pantry={pantry}
+                      favorite={favorites.some((r) => r.id === recipe.id)}
+                      onFavorite={() => toggleFavorite(recipe)}
+                      onOpen={() => setDetail(recipe)}
+                      index={index}
+                    />
+                  ))}
+                </div>
+                <div className="results-end">
+                  <span />
+                  {page === "family"
+                    ? `${displayed.length}道家常菜 · 全家共享`
+                    : page === "favorites"
+                      ? "留给下一次下厨"
+                      : view === "curated"
+                        ? `${displayed.length}道备餐做法 · 主料按一人份整理`
+                        : `${displayed.length}条原站结果 · 用料以原菜谱为准`}
+                  <span />
+                </div>
+                {page === "find" && view === "curated" && (
+                  <button className="more-online" onClick={onlineSearch}>
+                    <Search size={16} />
+                    再到网上找一找
+                    <ArrowRight size={16} />
+                  </button>
+                )}
+              </>
+            ) : (
+              <EmptyState
+                icon={
+                  page === "favorites" ? (
+                    <Bookmark size={32} />
+                  ) : (
+                    <CookingPot size={32} />
+                  )
+                }
+                title={
+                  page === "family"
+                    ? "家里的第一道拿手菜"
+                    : page === "favorites"
+                      ? "收藏夹还空着"
+                      : view === "online"
+                        ? "原站没有返回对应菜谱"
+                        : !selected.length
+                          ? "今天想用哪些食材"
+                          : "暂时没有符合条件的做法"
+                }
+                text={
+                  page === "family"
+                    ? "把熟悉的味道，记在一起。"
+                    : page === "favorites"
+                      ? "喜欢的菜，留在这里。"
+                      : selected.length
+                        ? chosen.map((x) => x.name).join(" · ")
+                        : "你的食材已经在厨房里。"
+                }
+              >
+                {page === "family" ? (
+                  <button
+                    className="primary-button"
+                    onClick={() => setFamilyEditor("new")}
+                  >
+                    <Plus size={17} />
+                    添加家常菜
+                  </button>
+                ) : page === "favorites" ? (
+                  <button
+                    className="primary-button"
+                    onClick={() => setPage("find")}
+                  >
+                    去找菜谱
+                    <ArrowRight size={16} />
+                  </button>
+                ) : !selected.length ? (
+                  <button
+                    className="primary-button"
+                    onClick={() => selectCombo(defaultSelected)}
+                  >
+                    鸡胸肉 + 西兰花 + 口蘑
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      className="secondary-button"
+                      onClick={() => {
+                        setStrict(false);
+                        setTool("");
+                        setTime(0);
+                        setPrep(false);
+                        setView("curated");
+                      }}
+                    >
+                      清除筛选
+                    </button>
+                    <a
+                      className="primary-button"
+                      href={directSearch}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      去原站查找
+                      <ArrowUpRight size={16} />
+                    </a>
+                  </>
+                )}
+              </EmptyState>
+            )}
+          </main>
+        </div>
+      )}
       {mobilePicker && (
         <Modal title="选择食材" onClose={() => setMobilePicker(false)}>
           {picker}

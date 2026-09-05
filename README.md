@@ -7,7 +7,18 @@
 - 家人可以添加、编辑菜谱和成品照片，移除后可撤销。
 - 全家菜谱保存在服务器；库存与收藏保存在各自浏览器，不自动扣库存。
 
-**当前仓库提供源代码，不代表网站已经上线。** GitHub Pages 只能托管静态网页，不能直接运行本项目的在线搜索和共享保存服务。[GitHub Pages 官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
+## 一周食谱网页版
+
+独立周食谱入口面向 GitHub Pages：每日早餐与加餐、14顿午晚餐、称重口径、主菜做法、周末备餐清单、用量汇总，以及整周打印版。菜单版本为2026年9月7日至13日，一人份、10盒工作日带饭；不包含个人身体数据或健康记录。
+
+```sh
+npm run build:pages
+npm run preview:pages
+```
+
+构建输出 `dist-pages/`，按仓库子路径 `/eat/` 生成静态资源。仓库 Settings → Pages → Source 设为 GitHub Actions 后，`Publish Weekly Menu` 工作流发布到 `https://sk-yan.github.io/eat/`，是否已上线以部署工作流结果为准。备餐勾选只保存于各自浏览器。
+
+**GitHub Pages 目前只发布周食谱，不运行完整应用的在线搜索或家庭共享写入接口。** 完整应用仍使用下方 Node 服务运行方式，已有功能没有被替换。[GitHub Pages 官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
 
 ## 运行
 
@@ -52,7 +63,7 @@ npm start
 
 ## GitHub 校验
 
-`.github/workflows/check.yml` 会在推送和 Pull Request 时安装依赖、运行测试和构建。它不会发布网站。家庭上传照片、运行数据、日志、依赖和 `.env` 已在 `.gitignore` 排除。
+`.github/workflows/check.yml` 会在推送和 Pull Request 时安装依赖、运行测试和两种构建。`.github/workflows/pages.yml` 只发布静态周食谱。家庭上传照片、运行数据、日志、依赖和 `.env` 已在 `.gitignore` 排除。
 
 ## 数据与能力边界
 
@@ -68,6 +79,8 @@ npm start
 
 - `src/`：界面、样式与交互。
 - `shared/ingredients.mjs`：默认库存与别名。
+- `shared/weekly-plan.mjs`：确认版周菜单、早餐替换与汇总数据。
+- `src/WeekPlan.tsx`：完整应用与静态入口共用的周食谱。
 - `shared/matching.mjs`：匹配、筛选、查询校验。
 - `server/source.mjs`：公开菜谱来源解析，禁止任意 URL 抓取。
 - `server/family.mjs`：家庭口令、菜谱持久化、照片和软删除。
