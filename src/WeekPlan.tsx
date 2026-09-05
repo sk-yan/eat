@@ -11,7 +11,7 @@ import {
   Copy,
   Dumbbell,
   Egg,
-  Leaf,
+  Flame,
   Moon,
   Package,
   Printer,
@@ -29,12 +29,21 @@ import {
   prepTasks,
   storageNotes,
   usageNotes,
-  proteinTarget,
-  mealProtein,
-  dailyProtein,
+  proteinBoost,
+  boostLines,
 } from "../shared/weekly-plan.mjs";
 import { ingredients } from "../shared/ingredients.mjs";
+import {
+  averageMacros,
+  breakfastMacros,
+  boostMacros,
+  dayMacros,
+  mealMacros,
+  roundMacros,
+  snackMacros,
+} from "../shared/nutrition.mjs";
 import sources from "../data/sources.json";
+import NutritionCalculator from "./NutritionCalculator";
 import "./weekly.css";
 
 type Meal = (typeof days)[number]["lunch"];
@@ -42,8 +51,14 @@ type Portion = Meal["meat"];
 type View = "daily" | "overview" | "prep" | "usage";
 type GuideKey = keyof typeof guides;
 const totals = weeklyTotals();
+const planAverage = roundMacros(averageMacros(days, proteinBoost));
+const specialNames: Record<string, string> = {
+  salmon: "三文鱼",
+  whey: "乳清蛋白粉",
+  oil: "牛油果油",
+};
 const foodName = (id: string) =>
-  ingredients.find((item) => item.id === id)?.name || id;
+  ingredients.find((item) => item.id === id)?.name || specialNames[id] || id;
 const amount = (item: Portion) =>
   `${foodName(item.id)} ${item.grams}g${item.basis === "cooked" ? "熟肉" : ""}`;
 const mealProteins = (meal: Meal) => [
@@ -54,9 +69,38 @@ const mealLines = (meal: Meal) => [
   mealProteins(meal).map(amount).join(" + "),
   meal.vegetables.map(amount).join(" + "),
   `糙米饭 ${meal.rice}g熟重${meal.starch ? ` + ${amount(meal.starch)}` : ""}`,
+  `牛油果油 ${meal.oil}g`,
 ];
 const asset = (path: string) =>
   `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+
+function MacroStrip({
+  value,
+  compact = false,
+}: {
+  value: ReturnType<typeof roundMacros>;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className={`macro-strip ${compact ? "compact" : ""}`}
+      aria-label={`热量${value.calories}千卡，蛋白质${value.protein}克，脂肪${value.fat}克，碳水${value.carbs}克`}
+    >
+      <span>
+        <b>{value.calories}</b> kcal
+      </span>
+      <span className="macro-p">
+        <b>P {value.protein}</b>g
+      </span>
+      <span className="macro-f">
+        <b>F {value.fat}</b>g
+      </span>
+      <span className="macro-c">
+        <b>C {value.carbs}</b>g
+      </span>
+    </div>
+  );
+}
 
 function MealCard({
   meal,
@@ -70,6 +114,7 @@ function MealCard({
   onOpen: () => void;
 }) {
   const source = sources[meal.imageKey as keyof typeof sources];
+  const macros = roundMacros(mealMacros(meal));
   return (
     <article className="week-meal">
       <div className="week-meal-header">
@@ -85,9 +130,7 @@ function MealCard({
           <span className="week-meta">
             {guides[meal.guide as GuideKey].tool}
           </span>
-          <span className="week-protein-badge">
-            约{Math.round(mealProtein(meal))}g蛋白质
-          </span>
+          <MacroStrip value={macros} compact />
         </div>
         <img
           src={asset(source.localImage)}
@@ -98,7 +141,7 @@ function MealCard({
       </div>
       <dl className="week-portions">
         <div>
-          <dt>肉类</dt>
+          <dt>主蛋白</dt>
           <dd>
             {mealProteins(meal).map((item) => (
               <span key={item.id}>{amount(item)}</span>
@@ -141,6 +184,7 @@ function MealCard({
 function GuideDialog({ meal, onClose }: { meal: Meal; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const guide = guides[meal.guide as GuideKey];
+  const macros = roundMacros(mealMacros(meal));
   useEffect(() => {
     const dialog = ref.current;
     dialog?.showModal();
@@ -180,6 +224,7 @@ function GuideDialog({ meal, onClose }: { meal: Meal; onClose: () => void }) {
       </header>
       <div className="week-dialog-body">
         <h3>这顿先称好</h3>
+        <MacroStrip value={macros} />
         <ul className="week-meal-lines">
           {mealLines(meal).map((line) => (
             <li key={line}>{line}</li>
@@ -228,9 +273,10 @@ function Overview({ onOpen }: { onOpen?: (meal: Meal) => void }) {
                 <p className="week-snack-text">
                   加餐：{snackLines(day).join(" + ")}
                 </p>
-                <span className="week-overview-protein">
-                  全天约{Math.round(dailyProtein(day))}g蛋白质
-                </span>
+                <MacroStrip
+                  value={roundMacros(dayMacros(day, proteinBoost))}
+                  compact
+                />
               </td>
               {[day.lunch, day.dinner].map((meal, index) => (
                 <td key={index}>
@@ -284,6 +330,10 @@ export default function WeekPlan({
     }
   });
   const day = days.find((item) => item.id === dayId) || days[0];
+  const currentDayMacros = roundMacros(dayMacros(day, proteinBoost));
+  const currentBreakfastMacros = roundMacros(breakfastMacros(day));
+  const currentSnackMacros = roundMacros(snackMacros(day));
+  const currentBoostMacros = roundMacros(boostMacros(proteinBoost));
   useEffect(() => {
     if (!toast) return;
     const timeout = setTimeout(() => setToast(""), 3500);
@@ -324,7 +374,9 @@ export default function WeekPlan({
         <div>
           <p className="week-eyebrow">{week.label} · 2026</p>
           <h1>一周食谱</h1>
-          <p className="week-heading-note">一人份 · 工作日午晚餐带饭</p>
+          <p className="week-heading-note">
+            一人份 · 减脂低碳高蛋白 · 工作日带饭
+          </p>
         </div>
         <div className="week-heading-actions">
           <button
@@ -347,25 +399,24 @@ export default function WeekPlan({
       </header>
       <div className="week-summary">
         <span>
-          <Package size={17} />
-          <b>10</b>盒工作日带饭
+          <Flame size={17} />
+          <b>{planAverage.calories}</b>kcal / 天
         </span>
         <span>
-          <Leaf size={17} />
-          <b>300g</b>蔬菜 / 餐
+          <b>P {planAverage.protein}g</b>蛋白质
         </span>
         <span>
-          <CookingPot size={17} />
-          <b>2.8kg</b>熟饭 / 周
+          <b>F {planAverage.fat}g</b>脂肪
         </span>
         <span>
-          <Dumbbell size={17} />
-          <b>
-            {proteinTarget.min}-{proteinTarget.max}g
-          </b>
-          蛋白质 / 天
+          <b>C {planAverage.carbs}g</b>碳水
         </span>
       </div>
+      <p className="week-protein-balance">
+        <strong>主菜分配：</strong>
+        牛肉3顿、三文鱼2顿、虾仁2顿、去皮鸡腿3顿、鸡胸4顿。高蛋白看全天总量，不等于每顿都只吃红肉。
+      </p>
+      <NutritionCalculator plan={planAverage} />
       <nav className="week-views" aria-label="周食谱视图">
         {(
           [
@@ -406,24 +457,18 @@ export default function WeekPlan({
               ))}
             </nav>
             <section
-              className="week-protein-meter"
-              aria-label={`${day.label}蛋白质估算`}
+              className="week-day-macros"
+              aria-label={`${day.label}营养估算`}
             >
               <div>
                 <span>
-                  <Dumbbell size={18} />
-                  今日蛋白质
+                  <Flame size={18} />
+                  今日合计
                 </span>
-                <strong>约{Math.round(dailyProtein(day))}g</strong>
+                <strong>约{currentDayMacros.calories} kcal</strong>
               </div>
-              <progress
-                max={proteinTarget.max}
-                value={Math.min(dailyProtein(day), proteinTarget.max)}
-              />
-              <p>
-                目标{proteinTarget.min}-{proteinTarget.max}
-                g；按常见食物成分估算，以包装营养表和实际可食重量为准。
-              </p>
+              <MacroStrip value={currentDayMacros} />
+              <p>含早餐、加餐、补蛋白、午餐和晚餐；P/F/C为估算值。</p>
             </section>
             <section
               className="week-breakfast"
@@ -435,6 +480,7 @@ export default function WeekPlan({
                   早餐
                 </h2>
                 <p>{breakfastLines(day).join(" + ")}</p>
+                <MacroStrip value={currentBreakfastMacros} compact />
               </div>
               <div>
                 <h2>
@@ -442,6 +488,16 @@ export default function WeekPlan({
                   加餐
                 </h2>
                 <p>{snackLines(day).join(" + ")}</p>
+                <MacroStrip value={currentSnackMacros} compact />
+              </div>
+              <div className="protein-boost">
+                <h2>
+                  <Dumbbell size={19} />
+                  补蛋白
+                </h2>
+                <p>{boostLines().join(" + ")}</p>
+                <MacroStrip value={currentBoostMacros} compact />
+                <small>乳清175g/周为新增项</small>
               </div>
             </section>
             <div className="week-meals">
@@ -539,7 +595,9 @@ export default function WeekPlan({
                 </thead>
                 <tbody>
                   {ingredients
-                    .filter((item) => totals.foods[item.id])
+                    .filter(
+                      (item) => totals.foods[item.id] && item.id !== "oil",
+                    )
                     .map((item) => (
                       <tr key={item.id}>
                         <th scope="row">{item.name}</th>
@@ -564,25 +622,32 @@ export default function WeekPlan({
                     ))}
                   <tr>
                     <th scope="row">三色糙米</th>
-                    <td>干米约1.0-1.1kg</td>
+                    <td>熟饭1450g</td>
                     <td>
-                      <strong>做成熟饭2.8kg</strong>
-                      ，按实际出饭率补足；其中工作日2kg、周末800g。
+                      午餐100-150g、晚餐75g；训练量大的当天优先安排150g午餐饭。
                     </td>
+                  </tr>
+                  <tr className="new-item-row">
+                    <th scope="row">三文鱼</th>
+                    <td>{totals.foods.salmon}g</td>
+                    <td>{usageNotes.salmon}</td>
+                  </tr>
+                  <tr className="new-item-row">
+                    <th scope="row">乳清蛋白粉</th>
+                    <td>{totals.foods.whey}g</td>
+                    <td>{usageNotes.whey}</td>
                   </tr>
                   <tr>
                     <th scope="row">牛油果油</th>
-                    <td>105-140g</td>
-                    <td>
-                      每日合计15-20g，所有菜共享。升与公斤不能直接等量扣减。
-                    </td>
+                    <td>{totals.foods.oil}g</td>
+                    <td>每餐已经单独计入，全天5-25g；不额外随手倒油。</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <p className="week-weight-note">
               蔬菜共{totals.vegetables / 1000}
-              kg；红薯450g、土豆800g。可选早餐主食和额外试吃不在这张计划用量表内。
+              kg；红薯300g、土豆400g、熟糙米饭1450g。调味料和试吃不在营养估算内。
             </p>
           </section>
         )}
@@ -651,7 +716,7 @@ export default function WeekPlan({
       <div className="week-print">
         <Overview />
         <p>
-          饭与卤肉为熟重，其他按可食生重；每日总用油15-20g。后半周熟饭菜当天分份冷冻，前夜冷藏解冻，复热中心至少74℃。每餐蔬菜300g已经包含在清单内。
+          饭与卤肉为熟重，其他按可食生重；每日总用油5-25g。后半周熟饭菜当天分份冷冻，前夜冷藏解冻，复热中心至少74℃。每餐蔬菜300g已经包含在清单内。
         </p>
       </div>
       {detail && <GuideDialog meal={detail} onClose={() => setDetail(null)} />}

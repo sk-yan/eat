@@ -19,6 +19,11 @@ const queries = {
   babyShrimp: ["娃娃菜", "虾仁"],
   yogurt: ["蓝莓酸奶碗"],
   legMushroom: ["鸡腿", "口蘑"],
+  salmonAsparagus: ["三文鱼", "芦笋", "口蘑"],
+  salmonBroccoli: ["三文鱼", "西兰花"],
+};
+const directUrls = {
+  salmonBroccoli: "https://m.xiachufang.com/recipe/102847085/",
 };
 await mkdir("data", { recursive: true });
 await mkdir("public/images", { recursive: true });
@@ -33,23 +38,44 @@ try {
 for (const [id, query] of Object.entries(queries)) {
   if (only.length && !only.includes(id)) continue;
   try {
-    const result = await searchSource(query);
-    const chosen =
-      id === "chickenChoy"
-        ? result.recipes.find((item) => /菜心.*鸡胸.*炒饭/.test(item.title))
-        : result.recipes.find(
-            (item) => !/蛋糕|豆腐|炒饭|焖饭|汤饭|粥|猪肝|鸡胗/.test(item.title),
-          ) || result.recipes[0];
+    let chosen;
+    let detail = {};
+    if (directUrls[id]) {
+      detail = await fetchDetail(directUrls[id]);
+      chosen = {
+        id: `web-${new URL(directUrls[id]).pathname.split("/")[2]}`,
+        title: detail.title,
+        url: directUrls[id],
+        image: detail.image,
+        source: "下厨房",
+        origin: "online",
+        rating: null,
+        ingredientIds: [],
+        ingredientLines: [],
+        ingredientVerified: false,
+      };
+    } else {
+      const result = await searchSource(query);
+      chosen =
+        id === "salmonAsparagus"
+          ? result.recipes.find((item) => item.url.includes("107743616"))
+          : id === "chickenChoy"
+            ? result.recipes.find((item) => /菜心.*鸡胸.*炒饭/.test(item.title))
+            : result.recipes.find(
+                (item) =>
+                  !/蛋糕|豆腐|炒饭|焖饭|汤饭|粥|猪肝|鸡胗/.test(item.title),
+              ) || result.recipes[0];
+    }
     if (!chosen) {
       console.log(`${id}: no results`);
       continue;
     }
-    let detail = {};
-    try {
-      detail = await fetchDetail(chosen.url);
-    } catch {
-      /* Search result remains a valid source link. */
-    }
+    if (!Object.keys(detail).length)
+      try {
+        detail = await fetchDetail(chosen.url);
+      } catch {
+        /* Search result remains a valid source link. */
+      }
     const photo = detail.image || chosen.image;
     if (photo) {
       const photoUrl = new URL(photo);

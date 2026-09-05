@@ -32,12 +32,7 @@
     "origin": "online",
     "rating": "7.2",
     "ingredientIds": [],
-    "ingredientLines": [
-      "一块鸡胸肉",
-      "一小盒口蘑",
-      "1～2个蒜头",
-      "1小把葱花"
-    ],
+    "ingredientLines": ["一块鸡胸肉", "一小盒口蘑", "1～2个蒜头", "1小把葱花"],
     "ingredientVerified": true,
     "localImage": "/images/chickenMushroom.jpg",
     "author": "春暖花开9628wm",
@@ -182,11 +177,7 @@
     "origin": "online",
     "rating": "9.1",
     "ingredientIds": [],
-    "ingredientLines": [
-      "1块牛排",
-      "300克口蘑",
-      "10来个蒜瓣"
-    ],
+    "ingredientLines": ["1块牛排", "300克口蘑", "10来个蒜瓣"],
     "ingredientVerified": true,
     "localImage": "/images/steakMushroom.jpg",
     "author": "Yang妈美食",
@@ -246,11 +237,7 @@
     "origin": "online",
     "rating": "8.6",
     "ingredientIds": [],
-    "ingredientLines": [
-      "4个鸡腿🍗",
-      "2个鸡翅根",
-      "4个水煮蛋"
-    ],
+    "ingredientLines": ["4个鸡腿🍗", "2个鸡翅根", "4个水煮蛋"],
     "ingredientVerified": true,
     "localImage": "/images/braisedLeg.jpg",
     "author": "花卷鸭",
@@ -399,5 +386,49 @@
     "author": "厨房笔记-fang",
     "checkedAt": "2026-09-05T12:04:27.490Z",
     "query": "鸡胸肉 西兰花 口蘑"
+  },
+  "salmonAsparagus": {
+    "id": "web-107743616",
+    "title": "芦笋口蘑炒三文鱼｜15分钟低卡高蛋白快手餐",
+    "url": "https://m.xiachufang.com/recipe/107743616/",
+    "image": "https://i2.chuimg.com/c7d5e1d3fb764ab49741aeb19d5a32f1_1920w_2560h.jpg?imageView2/1/w/300/h/200/q/75/format/jpg",
+    "source": "下厨房",
+    "origin": "online",
+    "rating": null,
+    "ingredientIds": [],
+    "ingredientLines": [
+      "200克.切成1.5cm左右的方块，带点脂肪更香三文鱼",
+      "4-5根去老根切长段芦笋",
+      "6-8个切片口蘑",
+      "腌鱼加调味用黑胡椒碎",
+      "少许盐",
+      "黄油炒更香/橄榄油清爽橄榄油/黄油都可以"
+    ],
+    "ingredientVerified": true,
+    "localImage": "/images/salmonAsparagus.jpg",
+    "author": "昊昊与辰辰的爸爸",
+    "checkedAt": "2026-09-05T15:33:06.470Z",
+    "query": "三文鱼 芦笋 口蘑"
+  },
+  "salmonBroccoli": {
+    "id": "web-102847085",
+    "title": "三文鱼炒西兰花",
+    "url": "https://m.xiachufang.com/recipe/102847085/",
+    "image": "https://i2.chuimg.com/5577fc40814445209cb7fa214dd72ad9_3024w_4032h.jpg?imageView2/1/w/300/h/200/q/75/format/jpg",
+    "source": "下厨房",
+    "origin": "online",
+    "rating": null,
+    "ingredientIds": [],
+    "ingredientLines": [
+      "一朵西兰花",
+      "200克三文鱼",
+      "少许葱姜蒜末",
+      "适量盐 鸡精 鱼露 蚝油"
+    ],
+    "ingredientVerified": true,
+    "localImage": "/images/salmonBroccoli.jpg",
+    "author": "eyu妈小厨房",
+    "checkedAt": "2026-09-05T15:34:55.586Z",
+    "query": "三文鱼 西兰花"
   }
 }

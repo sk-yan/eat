@@ -20,6 +20,7 @@ const meal = (
   rice,
   starch = null,
   extraProtein = null,
+  oil = 0,
 ) => ({
   title,
   guide,
@@ -29,7 +30,10 @@ const meal = (
   rice,
   starch,
   extraProtein,
+  oil,
 });
+
+export const proteinBoost = [portion("breast", 75), portion("whey", 25)];
 
 export const days = [
   {
@@ -43,24 +47,29 @@ export const days = [
       "卤鸡腿配菜心",
       "braise",
       "braisedLeg",
-      portion("leg", 110, "cooked", 150),
+      portion("leg", 150, "cooked", 205),
       [
         ["choy", 250],
         ["carrot", 50],
       ],
-      250,
+      150,
+      null,
+      null,
+      10,
     ),
     dinner: meal(
       "蒜香鸡胸配菜心口蘑",
       "chicken",
       "chickenMushroom",
-      portion("breast", 170),
+      portion("breast", 180),
       [
         ["choy", 250],
         ["mushroom", 50],
       ],
-      150,
-      portion("sweet", 150),
+      75,
+      portion("sweet", 100),
+      null,
+      10,
     ),
   },
   {
@@ -74,26 +83,30 @@ export const days = [
       "菠菜菌菇虾仁",
       "shrimp",
       "shrimpMushroom",
-      portion("shrimp", 150),
+      portion("shrimp", 180),
       [
         ["spinach", 150],
         ["mushroom", 100],
         ["onion", 50],
       ],
-      250,
+      125,
+      null,
+      null,
+      5,
     ),
     dinner: meal(
-      "黑椒鸡胸配菠菜",
-      "chicken",
-      "chickenMushroom",
-      portion("breast", 170),
+      "芦笋口蘑三文鱼",
+      "salmon",
+      "salmonAsparagus",
+      portion("salmon", 200),
       [
-        ["spinach", 150],
-        ["carrot", 100],
-        ["onion", 50],
+        ["asparagus", 200],
+        ["mushroom", 100],
       ],
-      150,
-      portion("potato", 200),
+      75,
+      portion("potato", 100),
+      null,
+      5,
     ),
   },
   {
@@ -107,24 +120,29 @@ export const days = [
       "卤牛腱配娃娃菜",
       "braise",
       "beefShank",
-      portion("shank", 120, "cooked", 180),
+      portion("shank", 150, "cooked", 225),
       [
         ["baby", 200],
         ["carrot", 100],
       ],
-      250,
+      150,
+      null,
+      null,
+      8,
     ),
     dinner: meal(
       "卤鸡腿配西兰花口蘑",
       "braise",
       "braisedLeg",
-      portion("leg", 110, "cooked", 150),
+      portion("leg", 150, "cooked", 205),
       [
         ["broccoli", 200],
         ["mushroom", 100],
       ],
-      150,
-      portion("sweet", 150),
+      75,
+      portion("sweet", 100),
+      null,
+      7,
     ),
   },
   {
@@ -138,25 +156,31 @@ export const days = [
       "洋葱焖牛肋条",
       "rib",
       "beefRib",
-      portion("rib", 150),
+      portion("rib", 180),
       [
         ["onion", 150],
         ["carrot", 100],
         ["mushroom", 50],
       ],
-      250,
+      100,
+      null,
+      null,
+      8,
     ),
     dinner: meal(
-      "芦笋口蘑鸡胸",
+      "黑椒鸡胸配菠菜",
       "chicken",
-      "chickenAsparagus",
-      portion("breast", 170),
+      "chickenMushroom",
+      portion("breast", 180),
       [
-        ["asparagus", 200],
-        ["mushroom", 100],
+        ["spinach", 150],
+        ["carrot", 100],
+        ["onion", 50],
       ],
-      150,
-      portion("potato", 200),
+      75,
+      portion("potato", 100),
+      null,
+      7,
     ),
   },
   {
@@ -170,25 +194,29 @@ export const days = [
       "煎牛排配双色蔬菜",
       "steak",
       "steakMushroom",
-      portion("steak", 150),
+      portion("steak", 180),
       [
         ["baby", 200],
         ["broccoli", 100],
       ],
-      250,
+      150,
+      null,
+      null,
+      8,
     ),
     dinner: meal(
-      "芦笋口蘑虾仁鸡胸",
+      "芦笋口蘑虾仁",
       "shrimp",
       "shrimpAsparagus",
-      portion("shrimp", 100),
+      portion("shrimp", 180),
       [
         ["asparagus", 200],
         ["mushroom", 100],
       ],
-      150,
-      portion("potato", 200),
-      portion("breast", 75),
+      75,
+      portion("potato", 100),
+      null,
+      7,
     ),
   },
   {
@@ -202,24 +230,29 @@ export const days = [
       "卤鸡腿配娃娃菜",
       "braise",
       "braisedLeg",
-      portion("leg", 130, "cooked", 175),
+      portion("leg", 150, "cooked", 205),
       [
         ["baby", 200],
         ["carrot", 100],
       ],
-      250,
+      125,
+      null,
+      null,
+      3,
     ),
     dinner: meal(
-      "西兰花口蘑鸡胸",
-      "chicken",
-      "chickenThree",
-      portion("breast", 170),
+      "西兰花口蘑三文鱼",
+      "salmon",
+      "salmonBroccoli",
+      portion("salmon", 200),
       [
         ["broccoli", 250],
         ["mushroom", 50],
       ],
-      150,
-      portion("sweet", 150),
+      75,
+      portion("sweet", 100),
+      null,
+      2,
     ),
   },
   {
@@ -233,26 +266,31 @@ export const days = [
       "洋葱鸡胸配娃娃菜",
       "chicken",
       "chickenMushroom",
-      portion("breast", 180),
+      portion("breast", 200),
       [
         ["baby", 150],
         ["onion", 100],
         ["carrot", 50],
       ],
-      250,
+      125,
+      null,
+      null,
+      12,
     ),
     dinner: meal(
       "芦笋胡萝卜口蘑鸡胸",
       "chicken",
       "chickenAsparagus",
-      portion("breast", 150),
+      portion("breast", 180),
       [
         ["asparagus", 100],
         ["mushroom", 100],
         ["carrot", 100],
       ],
-      150,
-      portion("potato", 200),
+      75,
+      portion("potato", 100),
+      null,
+      13,
     ),
   },
 ];
@@ -268,58 +306,8 @@ export function snackLines(day) {
   return day.extraYogurt ? [...lines, "另加酸奶 135g"] : lines;
 }
 
-export const proteinTarget = { min: 120, max: 130 };
-
-// Approximate protein values from generic foods. Packaged product labels and
-// edible yield take priority over these planning estimates.
-const proteinPerUnit = {
-  egg: 6.3,
-  milk: 0.032,
-  yogurt: 0.035,
-  blueberry: 0.007,
-  breast: 0.225,
-  leg: 0.26,
-  shank: 0.3,
-  rib: 0.2,
-  steak: 0.21,
-  shrimp: 0.2,
-  rice: 0.026,
-  sweet: 0.016,
-  potato: 0.02,
-  choy: 0.015,
-  carrot: 0.009,
-  mushroom: 0.031,
-  spinach: 0.029,
-  onion: 0.011,
-  baby: 0.012,
-  broccoli: 0.028,
-  asparagus: 0.022,
-};
-
-function portionProtein(item) {
-  return item.grams * (proteinPerUnit[item.id] || 0);
-}
-
-export function mealProtein(plate) {
-  return (
-    portionProtein(plate.meat) +
-    (plate.extraProtein ? portionProtein(plate.extraProtein) : 0) +
-    plate.vegetables.reduce((sum, item) => sum + portionProtein(item), 0) +
-    plate.rice * proteinPerUnit.rice +
-    (plate.starch ? portionProtein(plate.starch) : 0)
-  );
-}
-
-export function dailyProtein(day) {
-  const yogurt = day.extraYogurt ? 270 : 135;
-  return (
-    2 * proteinPerUnit.egg +
-    250 * proteinPerUnit.milk +
-    yogurt * proteinPerUnit.yogurt +
-    150 * proteinPerUnit.blueberry +
-    mealProtein(day.lunch) +
-    mealProtein(day.dinner)
-  );
+export function boostLines() {
+  return ["鸡胸肉 75g", "乳清蛋白粉 25g（冲水）"];
 }
 /** @returns {{ rice: number, vegetables: number, foods: Record<string, number>, cooked: Record<string, number> }} */
 export function weeklyTotals() {
@@ -332,6 +320,8 @@ export function weeklyTotals() {
     add(result.foods, "milk", 250);
     add(result.foods, "yogurt", day.extraYogurt ? 270 : 135);
     add(result.foods, "blueberry", 150);
+    for (const item of proteinBoost)
+      add(result.foods, item.id, item.rawEquivalent);
     for (const plate of [day.lunch, day.dinner]) {
       result.rice += plate.rice;
       add(result.foods, plate.meat.id, plate.meat.rawEquivalent);
@@ -348,6 +338,7 @@ export function weeklyTotals() {
         add(result.foods, item.id, item.grams);
       }
       if (plate.starch) add(result.foods, plate.starch.id, plate.starch.grams);
+      add(result.foods, "oil", plate.oil || 0);
     }
   }
   return result;
@@ -357,20 +348,19 @@ export const guides = {
   braise: {
     title: "牛腱与鸡腿：同卤汁，分阶段",
     tool: "高压锅 + 珐琅锅",
-    batch: "一批取牛腱600g、带骨琵琶腿约850-950g；不是这一餐全部吃掉。",
+    batch: "一批取牛腱600g、带骨琵琶腿约1.1-1.25kg；不是这一餐全部吃掉。",
     steps: [
       "牛腱焯水后放高压锅，加姜、八角1个、香叶1-2片、生抽15-20ml、老抽3-5ml。水量和装量按机型说明。",
       "用本机牛肉程序；支持手动计时的机型，上压后约25-35分钟可作为起点。肉块大小和压力会影响时间，必须完全泄压再开盖。",
       "熟牛腱取出分浅盒。当天卤汁转珐琅锅煮开，再放鸡腿小火煮约20-30分钟；最厚处靠近骨头但不碰骨的位置至少74℃。",
-      "鸡腿去皮去骨，按本周三餐分熟肉110g、110g、130g，多余的另冻。牛腱本周用熟肉约120g；其余按实际成品分装冷冻。",
+      "鸡腿去皮去骨，按本周三餐各分熟肉150g，多余的另冻。牛腱本周用熟肉约150g；其余按实际成品分装冷冻。",
       "牛腱和鸡腿不从头到尾一起高压。熟肉及时浅份冷却入冰箱，不在卤汁里室温过夜；卤汁不当汤喝，也不大量拌饭。",
     ],
   },
   chicken: {
     title: "蒜香 / 黑椒鸡胸",
     tool: "空气炸锅或铁锅",
-    batch:
-      "本周鸡胸共1085g：170g×4份、180g×1份、150g×1份、75g×1份。75g那份与周五虾仁同餐。",
+    batch: "正餐鸡胸共740g；另分7份各75g作每日补蛋白。本周鸡胸总计1265g。",
     steps: [
       "按本餐生重称鸡胸，切成约1-1.5cm的薄片。蒜香用蒜末，黑椒用黑胡椒；少量生抽、水和淀粉抓匀，冷藏腌约20分钟。",
       "空气炸锅180℃约10-15分钟，中途检查、翻面。或者铁锅少油分散煎炒。时间只作参考，以鸡肉中心至少74℃为准。",
@@ -381,33 +371,44 @@ export const guides = {
   shrimp: {
     title: "蔬菜炒虾仁",
     tool: "铁锅",
-    batch: "本周虾仁两份：解冻沥水后150g、100g。",
+    batch: "本周虾仁两份，解冻沥水后各180g。",
     steps: [
       "按包装在冰箱冷藏解冻，沥水后称本餐虾仁。先确认包装是生虾还是熟冻虾，分别按包装加热要求处理。",
       "菠菜焯熟；芦笋去老根切段；口蘑与洋葱切好。按当日配菜组合先将蔬菜炒熟。",
       "锅中少油，将生虾仁炒至通体不透明、肉质紧实，再和熟蔬菜拌匀。不要依赖固定分钟数判断所有大小的虾。",
-      "按本餐用量配熟饭和土豆。当天吃的及时冷藏，后半周份量及时分装冷冻。",
+      "按本餐用量配熟饭和100g土豆。当天吃的及时冷藏，后半周份量及时分装冷冻。",
+    ],
+  },
+  salmon: {
+    title: "香煎三文鱼",
+    tool: "铁锅或空气炸锅",
+    batch: "本周两份，每份200g；三文鱼本身含脂肪，按表内少油烹调。",
+    steps: [
+      "三文鱼冷藏解冻后吸干表面水分，每份200g，用少量盐、黑胡椒和蒜调味，静置约10分钟。",
+      "铁锅薄薄抹油，中火先煎鱼皮面，再翻面煎熟；或按空气炸锅说明加热。厚度不同，不用固定分钟数替代熟度检查。",
+      "芦笋去老根、口蘑切片，或将西兰花切小朵；使用本餐已经计入的油量将蔬菜炒熟。",
+      "带饭的三文鱼按鱼肉中心至少63℃熟制，及时浅盒冷却；在公司作为剩餐复热到74℃。不采用原菜谱保留粉色中心的做法。",
     ],
   },
   rib: {
     title: "洋葱焖牛肋条",
     tool: "珐琅锅或高压锅",
-    batch: "本周吃净生肉150g。可做300g分2份，一份用这周、一份冻存。",
+    batch: "本周吃净生肉180g。多做的部分按实际熟成品另行冷冻。",
     steps: [
-      "挑去明显肥油；如果带骨，骨头不计入150g净肉。牛肉切块、焯水。",
+      "挑去明显肥油；如果带骨，骨头不计入180g净肉。牛肉切块、焯水。",
       "加本餐洋葱、胡萝卜、姜片、少量生抽和水，珐琅锅焖炖至软。高压锅按本机适用肉类程序，水量和装量遵守说明。",
       "口蘑可后放，充分煮熟。撇去浮油，装盒少带油汤。",
-      "称本餐熟饭250g。若做两份牛肉，按实际熟成品均分，不把熟肉150g当成生肉150g。",
+      "称本餐熟饭100g。若一次多做，按实际熟成品分装，不把熟肉180g当成生肉180g。",
     ],
   },
   steak: {
     title: "煎牛排",
     tool: "铁锅或空气炸锅",
-    batch: "本餐取生肉150g；包装“一份”的克重不固定，不必整块都吃。",
+    batch: "本餐取生肉180g；包装“一份”的克重不固定，不必整块都吃。",
     steps: [
-      "按包装冷藏解冻，称150g，吸干表面水分，少量盐与黑胡椒调味。",
+      "按包装冷藏解冻，称180g，吸干表面水分，少量盐与黑胡椒调味。",
       "铁锅薄薄抹油，分面煎熟；时间随厚度变化。整块原切牛排中心至少63℃后静置3分钟。机械嫩化、重组或调理牛排按包装充分加热。",
-      "娃娃菜200g、西兰花100g分别炒熟或蒸熟，搭熟饭250g。",
+      "娃娃菜200g、西兰花100g分别炒熟或蒸熟，搭熟饭150g。",
       "带饭不预留半生状态，到公司作为熟剩餐仍需复热到74℃。想保留更好的口感，可以与周末一顿鸡胸交换，在家现煎，周用量不变。",
     ],
   },
@@ -417,22 +418,22 @@ export const prepTasks = [
   {
     id: "divide",
     title: "先分装，余量直接冷冻",
-    text: "牛腱留600g做一批；琵琶腿带骨约850-950g。鸡胸本周留1085g，分170g×4、180g、150g和75g；虾仁分150g和100g。其余生肉及时分袋冷冻，不整周放冷藏。",
+    text: "牛腱留600g做一批；琵琶腿带骨约1.1-1.25kg。正餐鸡胸740g，再分7份各75g作每日补蛋白，共1265g；虾仁分两份各180g；三文鱼分两份各200g。其余生肉及时分袋冷冻。",
   },
   {
     id: "braise",
     title: "牛腱先卤，鸡腿后卤",
-    text: "高压锅先做牛腱，完全泄压后捞出。卤汁转珐琅锅，再把鸡腿煮熟。鸡腿去皮去骨，分熟肉110g、110g、130g；牛腱本周取熟肉约120g。",
+    text: "高压锅先做牛腱，完全泄压后捞出。卤汁转珐琅锅，再把鸡腿煮熟。鸡腿去皮去骨，分3份熟肉各150g；牛腱本周取熟肉约150g。",
   },
   {
     id: "rice",
-    title: "工作日准备熟饭2kg",
-    text: "分5份250g午餐饭、5份150g晚餐饭。另准备红薯生重300g、土豆生重600g。周末再准备熟饭800g、红薯150g、土豆200g；干米按实际出饭率调整。",
+    title: "按天分装熟饭1450g",
+    text: "全周熟饭1450g：周一/三/五午餐各150g，周二/六/日各125g，周四100g；晚餐每天75g。另准备红薯300g、土豆400g，每份100g。干米按实际出饭率调整。",
   },
   {
     id: "cook",
     title: "分批做主菜和蔬菜",
-    text: "空气炸锅做鸡胸；铁锅炒虾和蔬菜；珐琅锅做牛肋条。菜心、菠菜优先安排周一周二。牛排可做熟冷冻，或周四晚做好周五带走。",
+    text: "空气炸锅做鸡胸；铁锅炒虾和蔬菜；珐琅锅做牛肋条。三文鱼按两份各200g分装，周二份冷藏解冻，周六份保持冷冻。牛排可做熟冷冻，或周四晚做好周五带走。",
   },
   {
     id: "breakfast",
@@ -453,24 +454,27 @@ export const prepTasks = [
 
 export const storageNotes = [
   "饭是熟重；未另标的肉、虾、蔬菜、薯类为烹调前可食重量。卤鸡腿按去皮去骨熟肉称；卤牛腱也是熟肉重量，生熟换算仅为估计。",
-  "本周每日烹调用油合计约15-20g，所有菜共用，不是每道菜各用15-20g。调味少量，按口味与实际需要调整。",
+  "本周牛油果油按餐称量，共约105g：每天合计5-25g。三文鱼、牛排和牛肋条本身含脂肪，相应少放油；低碳不等于油无限量。",
   "冷冻蓝莓先看包装。需加热的按标签处理；即食属性不清楚时，可采用更保守做法：充分煮沸至少1分钟，迅速降温后拌酸奶。",
   "鸡蛋和牛奶、酸奶蓝莓可以调整到不同时间吃。酸奶早餐仍搭配2个鸡蛋，牛奶移到下午；周一、三、五多出的1杯酸奶可移到实际训练日，全天不重复加量。",
   "早餐后仍饿时，可从余量里加红薯100-150g或适量糙米饭，并计入实际用量。这是一人份菜单起点，不是精确热量或治疗处方。",
   "本版蛋白质按通用食物成分估算，实际以牛奶、酸奶和肉类包装营养表及可食重量为准。如医生要求限制蛋白，以医生或注册营养师给出的目标为准。",
-  "如果不想吃这么多肉，可把部分鸡胸替换成低脂高蛋白奶制品或蛋清；按营养标签等量替换蛋白质，不把浓肉汤当作补蛋白方式。",
+  "逐餐热量按4×蛋白质+9×脂肪+4×碳水计算；酱油、淀粉等少量调料暂未计入。牛肋条和牛排肥瘦差异最大，包装标签或实物肥瘦应优先于页面估值。",
+  "默认补蛋白为每天鸡胸75g加乳清粉25g冲水。若不用乳清，可按包装营养表换成约20g蛋白质的低脂高蛋白酸奶、蛋清或额外肉类；不要按体积凭感觉替换。",
 ];
 
 export const usageNotes = {
-  breast: "生重1085g；余约1.515kg分袋冷冻。",
-  leg: "净生肉当量约475g，装盒熟肉共350g；备带骨约850-950g，以实际出肉率为准。",
+  breast: "正餐740g + 每日补蛋白525g，共生重1265g；余约1.335kg分袋冷冻。",
+  leg: "净生肉当量约615g，装盒熟肉共450g；备带骨约1.1-1.25kg，以实际出肉率为准。",
   shank:
-    "生重当量约180g，装盒熟肉约120g。牛腱可卤600g，本周取一份，其余冷冻；其他生肉也冷冻。",
-  rib: "去明显肥油后的可食生重150g；若带骨或修脂多，原料消耗更高。",
-  steak: "本周生重150g；库存10份的克重未知，余量实际称量。",
-  shrimp: "解冻沥水后250g；剩余量需考虑冰衣与沥水损耗。",
+    "生重当量约225g，装盒熟肉约150g。牛腱可卤600g，本周取一份，其余冷冻；其他生肉也冷冻。",
+  rib: "去明显肥油后的可食生重180g；若带骨或修脂多，原料消耗更高。",
+  steak: "本周生重180g；库存10份的克重未知，余量实际称量。",
+  shrimp: "解冻沥水后360g；剩余量需考虑冰衣与沥水损耗。",
+  salmon: "两份各200g，共400g；这是多样化修订版的新增购买项。",
   egg: "每天2个，正好14个。",
   milk: "共1.75L；开封保存期限另看包装。",
   yogurt: "135g×10杯；周一、三、五各2杯，其余每天1杯。",
   blueberry: "每天150g，共1.05kg；余约310g保持冷冻。",
+  whey: "每天25g冲水，共175g；这是高蛋白低碳修订版的新增项，当前采购清单里没有。",
 };
