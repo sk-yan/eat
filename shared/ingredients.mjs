@@ -42,11 +42,37 @@ export const ingredients = [
     unit: "份",
   },
   {
+    id: "stirBeef",
+    name: "黄牛嫩肉",
+    searchName: "小炒黄牛肉",
+    aliases: ["黄牛肉", "牛里脊", "嫩牛肉"],
+    category: "protein",
+    quantity: 0,
+    unit: "g",
+  },
+  {
     id: "shrimp",
     name: "虾仁",
     aliases: ["鲜虾", "大虾", "白虾"],
     category: "protein",
     quantity: 900,
+    unit: "g",
+  },
+  {
+    id: "salmon",
+    name: "三文鱼",
+    aliases: ["鲑鱼"],
+    category: "protein",
+    quantity: 0,
+    unit: "g",
+  },
+  {
+    id: "mandarinFish",
+    name: "鳜鱼",
+    searchName: "清蒸鳜鱼",
+    aliases: ["桂鱼"],
+    category: "protein",
+    quantity: 0,
     unit: "g",
   },
   {
@@ -72,6 +98,15 @@ export const ingredients = [
     aliases: ["口蘑", "蘑菇", "鲜菇"],
     category: "vegetable",
     quantity: 700,
+    unit: "g",
+  },
+  {
+    id: "shiitake",
+    name: "鲜香菇",
+    searchName: "香菇",
+    aliases: ["香菇", "冬菇"],
+    category: "vegetable",
+    quantity: 0,
     unit: "g",
   },
   {
@@ -121,6 +156,15 @@ export const ingredients = [
     aliases: ["紫洋葱", "红洋葱"],
     category: "vegetable",
     quantity: 1800,
+    unit: "g",
+  },
+  {
+    id: "pepper",
+    name: "青红椒",
+    searchName: "辣椒",
+    aliases: ["杭椒", "尖椒", "小米椒"],
+    category: "vegetable",
+    quantity: 0,
     unit: "g",
   },
   {
@@ -186,6 +230,7 @@ export const ingredients = [
 export const equipment = [
   { id: "wok", name: "铁锅" },
   { id: "air-fryer", name: "空气炸锅" },
+  { id: "steamer", name: "蒸锅" },
   { id: "pressure", name: "高压锅" },
   { id: "casserole", name: "珐琅锅" },
 ];

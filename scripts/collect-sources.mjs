@@ -21,9 +21,15 @@ const queries = {
   legMushroom: ["鸡腿", "口蘑"],
   salmonAsparagus: ["三文鱼", "芦笋", "口蘑"],
   salmonBroccoli: ["三文鱼", "西兰花"],
+  stirBeef: ["小炒黄牛肉"],
+  shiitakeChicken: ["香菇滑鸡"],
+  mandarinFish: ["清蒸鳜鱼"],
 };
 const directUrls = {
   salmonBroccoli: "https://m.xiachufang.com/recipe/102847085/",
+  stirBeef: "https://m.xiachufang.com/recipe/102879997/",
+  shiitakeChicken: "https://m.xiachufang.com/recipe/106835791/",
+  mandarinFish: "https://m.xiachufang.com/recipe/104192246/",
 };
 await mkdir("data", { recursive: true });
 await mkdir("public/images", { recursive: true });
@@ -105,5 +111,5 @@ for (const [id, query] of Object.entries(queries)) {
     console.log(`${id}: ${error.message}`);
   }
 }
-await writeFile("data/sources.json", JSON.stringify(sources, null, 2));
+await writeFile("data/sources.json", `${JSON.stringify(sources, null, 2)}\n`);
 console.log(`Saved ${Object.keys(sources).length} source records`);

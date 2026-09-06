@@ -50,7 +50,7 @@ const defaultSelected = ["breast", "broccoli", "mushroom"];
 function loadSaved() {
   try {
     const data = JSON.parse(localStorage.getItem(STORE) || "{}");
-    const pantry: Ingredient[] =
+    const savedPantry: Ingredient[] | null =
       Array.isArray(data.pantry) &&
       data.pantry.length &&
       data.pantry.every(
@@ -65,7 +65,16 @@ function loadSaved() {
           Array.isArray(x.aliases),
       )
         ? data.pantry
-        : initialIngredients;
+        : null;
+    const defaults = initialIngredients as Ingredient[];
+    const pantry: Ingredient[] = savedPantry
+      ? [
+          ...savedPantry,
+          ...defaults.filter(
+            (item) => !savedPantry.some((savedItem) => savedItem.id === item.id),
+          ),
+        ]
+      : defaults;
     return {
       pantry,
       selected: Array.isArray(data.selected)

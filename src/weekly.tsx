@@ -18,7 +18,7 @@ createRoot(document.getElementById("root")!).render(
       </header>
       <WeekPlan standalone />
       <footer className="week-site-footer">
-        低碳高蛋白修订版 · 菜单版本 2026.09.05
+        低碳高蛋白修订版 · 菜单版本 2026.09.06
       </footer>
     </div>
   </React.StrictMode>,

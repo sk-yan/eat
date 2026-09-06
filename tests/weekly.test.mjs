@@ -36,37 +36,37 @@ test("weekly menu contains seven days, fourteen meals and ten packed meals", () 
         ...meal.vegetables,
         ...(meal.starch ? [meal.starch] : []),
       ]) {
-        assert.ok(
-          ingredients.some((item) => item.id === portion.id) ||
-            portion.id === "salmon",
-        );
+        assert.ok(ingredients.some((item) => item.id === portion.id));
         assert.ok(portion.grams > 0);
       }
     }
 });
 test("weekly totals reconcile to the confirmed actual-purchase menu", () => {
   const totals = weeklyTotals();
-  assert.equal(totals.rice, 1205);
+  assert.equal(totals.rice, 1245);
   assert.equal(totals.vegetables, 4200);
   assert.deepEqual(totals.cooked, { leg: 730, shank: 150 });
   for (const [id, grams] of Object.entries({
-    breast: 1280,
+    breast: 1190,
     leg: 997,
     shank: 225,
-    rib: 230,
+    stirBeef: 250,
     steak: 240,
     shrimp: 540,
-    salmon: 420,
-    oil: 94,
+    salmon: 220,
+    mandarinFish: 650,
+    oil: 109,
     sweet: 300,
     potato: 400,
-    carrot: 600,
+    carrot: 450,
     choy: 500,
-    onion: 350,
-    baby: 750,
+    onion: 250,
+    baby: 700,
     spinach: 300,
     asparagus: 500,
     mushroom: 650,
+    shiitake: 100,
+    pepper: 200,
     broccoli: 550,
     egg: 14,
     milk: 1750,
@@ -78,16 +78,16 @@ test("weekly totals reconcile to the confirmed actual-purchase menu", () => {
     days
       .filter((day) => day.packed)
       .reduce((sum, day) => sum + day.lunch.rice + day.dinner.rice, 0),
-    875,
+    895,
   );
 });
 test("low-carb weekly plan keeps each day inside its macro guardrails", () => {
   const average = roundMacros(averageMacros(days));
   assert.deepEqual(average, {
-    calories: 1762,
-    protein: 164,
-    fat: 68,
-    carbs: 122,
+    calories: 1760,
+    protein: 166,
+    fat: 67,
+    carbs: 123,
   });
   for (const day of days) {
     const macros = roundMacros(dayMacros(day));
@@ -98,9 +98,14 @@ test("low-carb weekly plan keeps each day inside its macro guardrails", () => {
     assert.ok(mealMacros(day.dinner).protein >= 50, `${day.label}晚餐`);
   }
   const totals = weeklyTotals();
-  assert.equal(totals.foods.rib + totals.foods.steak + totals.foods.shank, 695);
+  assert.equal(
+    totals.foods.stirBeef + totals.foods.steak + totals.foods.shank,
+    715,
+  );
+  assert.equal(totals.foods.rib, undefined);
   assert.equal(totals.foods.shrimp, 540);
-  assert.equal(totals.foods.salmon, 420);
+  assert.equal(totals.foods.salmon, 220);
+  assert.equal(totals.foods.mandarinFish, 650);
   assert.equal(totals.foods.whey, undefined);
   assert.equal(days[2].lunch.extraProtein.id, "leg");
   assert.equal(days[2].lunch.extraProtein.grams, 100);
@@ -109,8 +114,9 @@ test("main dishes keep the agreed beef, fish, shrimp and poultry mix", () => {
   const mainIds = days.flatMap((day) => [day.lunch.meat.id, day.dinner.meat.id]);
   const count = (ids) => mainIds.filter((id) => ids.includes(id)).length;
 
-  assert.equal(count(["shank", "rib", "steak"]), 3);
-  assert.equal(count(["salmon"]), 2);
+  assert.equal(count(["shank", "stirBeef", "steak"]), 3);
+  assert.equal(count(["salmon"]), 1);
+  assert.equal(count(["mandarinFish"]), 1);
   assert.equal(count(["shrimp"]), 2);
   assert.equal(count(["leg"]), 3);
   assert.equal(count(["breast"]), 4);

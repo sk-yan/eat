@@ -49,13 +49,18 @@ type GuideKey = keyof typeof guides;
 const totals = weeklyTotals();
 const planAverage = roundMacros(averageMacros(days));
 const specialNames: Record<string, string> = {
-  salmon: "三文鱼",
   oil: "牛油果油",
 };
 const foodName = (id: string) =>
   ingredients.find((item) => item.id === id)?.name || specialNames[id] || id;
 const amount = (item: Portion) =>
-  `${foodName(item.id)} ${item.grams}g${item.basis === "cooked" ? "熟肉" : ""}`;
+  `${foodName(item.id)} ${item.grams}g${
+    item.basis === "cooked"
+      ? "熟肉"
+      : item.basis === "edible"
+        ? "可食鱼肉"
+        : ""
+  }`;
 const mealProteins = (meal: Meal) => [
   meal.meat,
   ...(meal.extraProtein ? [meal.extraProtein] : []),
@@ -236,7 +241,7 @@ function GuideDialog({ meal, onClose }: { meal: Meal; onClose: () => void }) {
           ))}
         </ol>
         <p className="week-note">
-          温度、肉块厚度、装载量和设备型号会影响用时。按本餐份量装盒，不把批量烹饪的全部成品装进一顿。
+          温度、肉块厚度、装载量和设备型号会影响用时。按本餐份量盛出或装盒，不把批量烹饪的全部成品算进一顿。
         </p>
       </div>
     </dialog>
@@ -408,7 +413,7 @@ export default function WeekPlan({
       </div>
       <p className="week-protein-balance">
         <strong>主菜分配：</strong>
-        牛肉3顿、三文鱼2顿、虾仁2顿、去皮鸡腿3顿、鸡胸4顿。蛋白质全部并入早餐和午晚餐，不另喝蛋白粉。
+        牛肉3顿、三文鱼1顿、鳜鱼1顿、虾仁2顿、去皮鸡腿3顿、鸡胸4顿。蛋白质全部并入早餐和午晚餐，不另喝蛋白粉。
       </p>
       <NutritionCalculator plan={planAverage} />
       <nav className="week-views" aria-label="周食谱视图">
@@ -568,6 +573,7 @@ export default function WeekPlan({
             <h2>这周取这些，剩下的留好</h2>
             <p className="week-note">
               按整周菜单汇总，不是重新购买清单。肉类生熟换算、骨头和食材损耗按实际出成率调整。
+              浅橙色行为待补买；已购牛肋条本周不安排，分袋冷冻。
             </p>
             <div className="week-table-wrap">
               <table className="week-usage">
@@ -584,7 +590,10 @@ export default function WeekPlan({
                       (item) => totals.foods[item.id] && item.id !== "oil",
                     )
                     .map((item) => (
-                      <tr key={item.id}>
+                      <tr
+                        key={item.id}
+                        className={item.quantity === 0 ? "new-item-row" : ""}
+                      >
                         <th scope="row">{item.name}</th>
                         <td>
                           {totals.foods[item.id]}
@@ -595,6 +604,9 @@ export default function WeekPlan({
                               : "g"}
                           {["leg", "shank"].includes(item.id) && (
                             <small>约，净生肉当量</small>
+                          )}
+                          {item.id === "mandarinFish" && (
+                            <small>约，整鱼采购重</small>
                           )}
                         </td>
                         <td>
@@ -607,15 +619,10 @@ export default function WeekPlan({
                     ))}
                   <tr>
                     <th scope="row">三色糙米</th>
-                    <td>熟饭1205g</td>
+                    <td>熟饭1245g</td>
                     <td>
-                      午餐80-130g、晚餐60g；训练量大的当天优先安排130g午餐饭。
+                      午餐100-130g、晚餐60-80g；训练量大的当天优先安排130g午餐饭。
                     </td>
-                  </tr>
-                  <tr className="new-item-row">
-                    <th scope="row">三文鱼</th>
-                    <td>{totals.foods.salmon}g</td>
-                    <td>{usageNotes.salmon}</td>
                   </tr>
                   <tr>
                     <th scope="row">牛油果油</th>
@@ -627,7 +634,7 @@ export default function WeekPlan({
             </div>
             <p className="week-weight-note">
               蔬菜共{totals.vegetables / 1000}
-              kg；红薯300g、土豆400g、熟糙米饭1205g。调味料和试吃不在营养估算内。
+              kg；红薯300g、土豆400g、熟糙米饭1245g。调味料和试吃不在营养估算内。
             </p>
           </section>
         )}
