@@ -28,6 +28,9 @@ import {
   prepTasks,
   storageNotes,
   usageNotes,
+  mealTiming,
+  dailyCookPlan,
+  riceBatches,
 } from "../shared/weekly-plan.mjs";
 import { ingredients } from "../shared/ingredients.mjs";
 import {
@@ -60,7 +63,7 @@ const amount = (item: Portion) =>
       : item.basis === "edible"
         ? "可食鱼肉"
         : ""
-  }`;
+  }${item.countHint ? ` · ${item.countHint}` : ""}`;
 const mealProteins = (meal: Meal) => [
   meal.meat,
   ...(meal.extraProtein ? [meal.extraProtein] : []),
@@ -106,11 +109,13 @@ function MealCard({
   meal,
   dinner,
   packed,
+  timing,
   onOpen,
 }: {
   meal: Meal;
   dinner?: boolean;
   packed: boolean;
+  timing: string;
   onOpen: () => void;
 }) {
   const source = sources[meal.imageKey as keyof typeof sources];
@@ -139,6 +144,10 @@ function MealCard({
           referrerPolicy="no-referrer"
         />
       </div>
+      <p className="week-meal-timing">
+        <Clock3 size={14} />
+        {timing}
+      </p>
       <dl className="week-portions">
         <div>
           <dt>主蛋白</dt>
@@ -291,6 +300,11 @@ function Overview({ onOpen }: { onOpen?: (meal: Meal) => void }) {
                   {mealLines(meal).map((line) => (
                     <p key={line}>{line}</p>
                   ))}
+                  <p className="week-timing-text">
+                    {mealTiming[day.id as keyof typeof mealTiming][
+                      index === 0 ? "lunch" : "dinner"
+                    ]}
+                  </p>
                 </td>
               ))}
             </tr>
@@ -494,12 +508,18 @@ export default function WeekPlan({
               <MealCard
                 meal={day.lunch}
                 packed={day.packed}
+                timing={
+                  mealTiming[day.id as keyof typeof mealTiming].lunch
+                }
                 onOpen={() => setDetail(day.lunch)}
               />
               <MealCard
                 meal={day.dinner}
                 dinner
                 packed={day.packed}
+                timing={
+                  mealTiming[day.id as keyof typeof mealTiming].dinner
+                }
                 onOpen={() => setDetail(day.dinner)}
               />
             </div>
@@ -521,14 +541,28 @@ export default function WeekPlan({
           <section className="week-section">
             <div className="week-section-heading">
               <div>
-                <h2>周末备好，工作日轻松一点</h2>
+                <h2>周末只分装，再卤牛腱和鸡腿</h2>
                 <p className="week-note">
-                  首次备10盒预留约3小时，按锅的容量分批。
+                  鸡胸、虾、三文鱼、黄牛肉和牛排不提前腌、不提前炒；前一晚冷藏解冻，烹调前再腌。
                 </p>
               </div>
               <span className="week-progress">
                 {done.length}/{prepTasks.length}项已完成
               </span>
+            </div>
+            <div className="week-prep-policy">
+              <div>
+                <strong>周末要做</strong>
+                <span>称重贴标签、生肉分袋冷冻、卤牛腱与三份鸡腿</span>
+              </div>
+              <div>
+                <strong>周末不做</strong>
+                <span>不炒鸡胸虾牛肉，不煎鱼和牛排，不提前腌一整周</span>
+              </div>
+              <div>
+                <strong>每天现做</strong>
+                <span>前一晚解冻，当天早晨现腌15-20分钟，做熟后装当天两盒</span>
+              </div>
             </div>
             <ol className="week-prep-list">
               {prepTasks.map((task, index) => (
@@ -566,6 +600,55 @@ export default function WeekPlan({
               查看牛腱与鸡腿的详细卤法
               <ArrowUpRight size={16} />
             </button>
+            <section className="daily-cook-section">
+              <div className="daily-cook-heading">
+                <h3>每天取哪袋，怎么做</h3>
+                <p>优先当天早晨现做；不想早起时，可在前一晚完成并及时冷藏。</p>
+              </div>
+              <div className="daily-cook-grid">
+                {dailyCookPlan.map((item) => (
+                  <article className="daily-cook-card" key={item.id}>
+                    <header>
+                      <strong>{item.day}</strong>
+                      <span>{item.when}</span>
+                    </header>
+                    <dl>
+                      <div>
+                        <dt>取出</dt>
+                        <dd>{item.thaw}</dd>
+                      </div>
+                      <div>
+                        <dt>腌制</dt>
+                        <dd>{item.marinate}</dd>
+                      </div>
+                      <div>
+                        <dt>做菜</dt>
+                        <dd>{item.cook}</dd>
+                      </div>
+                      <div>
+                        <dt>装盒</dt>
+                        <dd>{item.pack}</dd>
+                      </div>
+                    </dl>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <section className="rice-batch-section">
+              <div className="daily-cook-heading">
+                <h3>米饭两天做一次</h3>
+                <p>按熟重分盒；第二天以后的份量冷却后直接冷冻。</p>
+              </div>
+              <div className="rice-batch-grid">
+                {riceBatches.map((batch) => (
+                  <div key={batch.when}>
+                    <strong>{batch.when}</strong>
+                    <span>熟饭{batch.grams}g</span>
+                    <p>{batch.portions}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
           </section>
         )}
         {view === "usage" && (

@@ -7,6 +7,10 @@ import {
   guides,
   breakfastLines,
   snackLines,
+  prepTasks,
+  mealTiming,
+  dailyCookPlan,
+  riceBatches,
 } from "../shared/weekly-plan.mjs";
 import { ingredients } from "../shared/ingredients.mjs";
 import {
@@ -120,6 +124,38 @@ test("main dishes keep the agreed beef, fish, shrimp and poultry mix", () => {
   assert.equal(count(["shrimp"]), 2);
   assert.equal(count(["leg"]), 3);
   assert.equal(count(["breast"]), 4);
+});
+test("weekend prep only portions raw food and cooks the braised proteins", () => {
+  assert.deepEqual(
+    prepTasks.map((task) => task.id),
+    [
+      "labels",
+      "raw-protein",
+      "vegetables",
+      "braise-shank",
+      "braise-legs",
+      "store",
+    ],
+  );
+  const weekendText = prepTasks
+    .map((task) => `${task.title} ${task.text}`)
+    .join(" ");
+  assert.match(weekendText, /不提前腌制/);
+  assert.match(weekendText, /约5只中大鸡腿.*220g.*100g.*190g/);
+  assert.doesNotMatch(weekendText, /空气炸锅分批做鸡胸|铁锅做虾仁/);
+  assert.equal(dailyCookPlan.length, 7);
+  assert.equal(new Set(dailyCookPlan.map((item) => item.day)).size, 7);
+  assert.equal(
+    riceBatches.reduce((sum, batch) => sum + batch.grams, 0),
+    1245,
+  );
+  for (const day of days) {
+    assert.ok(mealTiming[day.id].lunch);
+    assert.ok(mealTiming[day.id].dinner);
+  }
+  assert.match(days[0].lunch.meat.countHint, /2只/);
+  assert.match(days[2].lunch.extraProtein.countHint, /1只/);
+  assert.match(days[5].lunch.meat.countHint, /3只大或4只小/);
 });
 test("milk and yogurt breakfasts alternate without duplicating daily food", () => {
   assert.equal(days.filter((day) => day.breakfast === "yogurt").length, 3);
