@@ -543,7 +543,7 @@ export default function WeekPlan({
               <div>
                 <h2>周末只分装，再卤牛腱和鸡腿</h2>
                 <p className="week-note">
-                  鸡胸、虾、三文鱼、黄牛肉和牛排不提前腌、不提前炒；前一晚冷藏解冻，烹调前再腌。
+                  鸡胸分袋腌好后立即冷冻；虾、三文鱼、黄牛肉、牛排和香菇滑鸡当天再调味。周末不提前炒熟。
                 </p>
               </div>
               <span className="week-progress">
@@ -553,15 +553,15 @@ export default function WeekPlan({
             <div className="week-prep-policy">
               <div>
                 <strong>周末要做</strong>
-                <span>称重贴标签、生肉分袋冷冻、卤牛腱与三份鸡腿</span>
+                <span>称重贴标签、鸡胸腌好冷冻、其他生肉分袋、卤牛腱和鸡腿</span>
               </div>
               <div>
                 <strong>周末不做</strong>
-                <span>不炒鸡胸虾牛肉，不煎鱼和牛排，不提前腌一整周</span>
+                <span>不炒熟鸡胸虾牛肉，不煎鱼和牛排；除鸡胸外不提前腌</span>
               </div>
               <div>
                 <strong>每天现做</strong>
-                <span>前一晚解冻，当天早晨现腌15-20分钟，做熟后装当天两盒</span>
+                <span>前一晚解冻；鸡胸直接做，其他肉当天调味后装两盒</span>
               </div>
             </div>
             <ol className="week-prep-list">

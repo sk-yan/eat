@@ -130,6 +130,7 @@ test("weekend prep only portions raw food and cooks the braised proteins", () =>
     prepTasks.map((task) => task.id),
     [
       "labels",
+      "marinate-breast",
       "raw-protein",
       "vegetables",
       "braise-shank",
@@ -140,7 +141,9 @@ test("weekend prep only portions raw food and cooks the braised proteins", () =>
   const weekendText = prepTasks
     .map((task) => `${task.title} ${task.text}`)
     .join(" ");
-  assert.match(weekendText, /不提前腌制/);
+  assert.match(weekendText, /鸡胸分五袋，提前腌好/);
+  assert.match(weekendText, /其余生肉只分装，不提前腌/);
+  assert.match(weekendText, /周一袋冷藏，其余压平后立即冷冻/);
   assert.match(weekendText, /约5只中大鸡腿.*220g.*100g.*190g/);
   assert.doesNotMatch(weekendText, /空气炸锅分批做鸡胸|铁锅做虾仁/);
   assert.equal(dailyCookPlan.length, 7);
